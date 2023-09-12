@@ -42,7 +42,7 @@ def startGame():
         if keys[py.K_DOWN] or keys[py.K_s] and pos_y < infoObject.current_h - height:
             pos_y += velocity
 
-        win.fill((8, 89, 80))
+        win.fill((16, 6, 48))
 
         py.draw.rect(win, (255, 0, 255), (pos_x, pos_y, width, height))
 

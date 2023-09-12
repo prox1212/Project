@@ -21,6 +21,7 @@ velocityDiagonal = 0.2
 run = True
 
 def startGame():
+    global pos_x, pos_y
     while run:
         py.time.delay(10)
 

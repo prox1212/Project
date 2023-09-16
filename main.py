@@ -1,4 +1,6 @@
 import pygame as py
+from login import *
+from backButton import *
 
 py.init()
 
@@ -46,6 +48,9 @@ def startGame():
         win.fill((16, 6, 48))
 
         py.draw.rect(win, (255, 0, 255), (pos_x, pos_y, width, height))
+
+        userDisplay()
+        back()
 
         py.display.update()
 

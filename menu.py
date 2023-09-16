@@ -1,6 +1,8 @@
 import pygame as py
 from main import *
 from instructions import *
+from register import *
+from login import *
 
 py.init()
 
@@ -46,7 +48,7 @@ registerRight = infoObject.current_w / 2.4 + buttonWidth
 run = True
 
 def menu():
-    global run
+    global run, loggedIn
     while run:
         py.time.delay(10)
 
@@ -87,6 +89,18 @@ def menu():
             if instructionsLeft <= mousePos[0] <= instructionsRight and instructionsTop <= mousePos[1] <= instructionsBottom:
                 print("Instructions button clicked")
                 instruction()
+
+        if py.mouse.get_pressed()[0]:
+            if registerLeft <= mousePos[0] <= registerRight and registerTop <= mousePos[1] <= registerBottom:
+                print("Register button clicked")
+                registerUser()
+
+        if py.mouse.get_pressed()[0]:
+            if loginLeft <= mousePos[0] <= loginRight and loginTop <= mousePos[1] <= loginBottom:
+                print("Login button clicked")
+                loginUser()
+
+        userDisplay()
         
 
         py.display.update()

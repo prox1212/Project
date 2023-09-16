@@ -1,5 +1,7 @@
 import pygame as py
 from instructions import *
+from login import userDisplay
+from backButton import *
 
 py.init()
 
@@ -18,26 +20,6 @@ WHITE = (255, 255, 255)
 
 run = True
 
-def back():
-    global run
-
-    mousePos = py.mouse.get_pos()
-
-    backTop = infoObject.current_h / 1.09
-    backLeft = infoObject.current_w / 1.13
-    backBottom = infoObject.current_h / 1.09 + 70
-    backRight = infoObject.current_w / 1.13 + 200
-
-    py.draw.rect(win, (255, 0, 0), (infoObject.current_w / 1.13, infoObject.current_h / 1.09, 200, 70))
-    back = myFontBig.render("Back", False, WHITE)
-    win.blit(back, (infoObject.current_w / 1.1, infoObject.current_h / 1.09))
-
-    if py.mouse.get_pressed()[0]:
-        if backLeft <= mousePos[0] <= backRight and backTop <= mousePos[1] <= backBottom:
-            import menu
-            menu.menu()
-            run = False
-
 def instruction():
     global run
     while run:
@@ -48,6 +30,8 @@ def instruction():
                 run = False
 
         win.fill((16, 6, 48))
+
+        userDisplay()
 
         back()
 

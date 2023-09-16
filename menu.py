@@ -1,5 +1,6 @@
 import pygame as py
 from main import *
+from instructions import *
 
 py.init()
 
@@ -81,6 +82,11 @@ def menu():
             if playLeft <= mousePos[0] <= playRight and playTop <= mousePos[1] <= playBottom:
                 print("Play button clicked")
                 startGame()
+
+        if py.mouse.get_pressed()[0]:
+            if instructionsLeft <= mousePos[0] <= instructionsRight and instructionsTop <= mousePos[1] <= instructionsBottom:
+                print("Instructions button clicked")
+                instruction()
         
 
         py.display.update()

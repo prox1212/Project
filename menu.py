@@ -44,8 +44,25 @@ registerLeft = infoObject.current_w / 2.4
 registerBottom = infoObject.current_h / 1.62 + buttonHeight
 registerRight = infoObject.current_w / 2.4 + buttonWidth
 
-
 run = True
+
+def exit():
+    global run
+
+    mousePos = py.mouse.get_pos()
+
+    backTop = infoObject.current_h / 1.09
+    backLeft = infoObject.current_w / 1.13
+    backBottom = infoObject.current_h / 1.09 + 70
+    backRight = infoObject.current_w / 1.13 + 200
+
+    py.draw.rect(win, (255, 0, 0), (infoObject.current_w / 1.13, infoObject.current_h / 1.09, 200, 70))
+    back = myFontBig.render("Exit", False, WHITE)
+    win.blit(back, (infoObject.current_w / 1.1, infoObject.current_h / 1.09))
+
+    if py.mouse.get_pressed()[0]:
+        if backLeft <= mousePos[0] <= backRight and backTop <= mousePos[1] <= backBottom:
+            run = False
 
 def menu():
     global run, loggedIn
@@ -80,6 +97,17 @@ def menu():
         register = myFontBig.render("Register", False, WHITE)
         win.blit(register, (infoObject.current_w / 2.28, infoObject.current_h / 1.6))
 
+        # if py.mouse.get_pressed()[0]:
+        #     if loggedIn == 'null':
+        #         print("Login null")
+        #         toPlay = myFontBig.render("You need to login to play!", False, WHITE)
+        #         win.blit(toPlay, (infoObject.current_w / 2.6, infoObject.current_h / 1.2))
+
+        #     if loggedIn != 'null':
+        #         if playLeft <= mousePos[0] <= playRight and playTop <= mousePos[1] <= playBottom:
+        #             print("Play button clicked")
+        #             startGame()
+        
         if py.mouse.get_pressed()[0]:
             if playLeft <= mousePos[0] <= playRight and playTop <= mousePos[1] <= playBottom:
                 print("Play button clicked")
@@ -101,7 +129,7 @@ def menu():
                 loginUser()
 
         userDisplay()
-        
+        exit()
 
         py.display.update()
 

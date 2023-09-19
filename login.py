@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 import sqlite3
 import pygame as py
+import threading
 
 py.init()
 
@@ -94,19 +95,24 @@ def levelUp():
         xp = 0
         level += 1
 
-        try:
-            
-            connection = sqlite3.connect("user_credentials.db")
-            cursor = connection.cursor()
+        # Move database update to a separate thread
+        def update_database():
+            try:
+                connection = sqlite3.connect("user_credentials.db")
+                cursor = connection.cursor()
 
-            cursor.execute("UPDATE users SET level=?, xp=?, xpToGo=? WHERE username=?", (level, xp, xpToGo, loggedIn))
+                cursor.execute("UPDATE users SET level=?, xp=?, xpToGo=? WHERE username=?", (level, xp, xpToGo, loggedIn))
 
-            connection.commit()
-            connection.close()
-        except sqlite3.Error as e:
-            print("SQLite error:", e)
-        except Exception as ex:
-            print("Error:", ex)
+                connection.commit()
+                connection.close()
+            except sqlite3.Error as e:
+                print("SQLite error:", e)
+            except Exception as ex:
+                print("Error:", ex)
+
+        # Create a new thread for database update
+        db_update_thread = threading.Thread(target=update_database)
+        db_update_thread.start()
 
 def levelXPDisplay():
     global progressionW

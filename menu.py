@@ -51,14 +51,14 @@ def exit():
 
     mousePos = py.mouse.get_pos()
 
-    backTop = infoObject.current_h / 1.09
-    backLeft = infoObject.current_w / 1.13
-    backBottom = infoObject.current_h / 1.09 + 70
-    backRight = infoObject.current_w / 1.13 + 200
+    backTop = infoObject.current_h / infoObject.current_h + 35
+    backLeft = infoObject.current_w / infoObject.current_w + 35
+    backBottom = infoObject.current_h / infoObject.current_w + 35 + 70
+    backRight = infoObject.current_w / infoObject.current_w + 35 + 200
 
-    py.draw.rect(win, (255, 0, 0), (infoObject.current_w / 1.13, infoObject.current_h / 1.09, 200, 70))
+    py.draw.rect(win, (255, 0, 0), (infoObject.current_w / infoObject.current_w + 35, infoObject.current_h / infoObject.current_h + 35, 200, 70))
     back = myFontBig.render("Exit", False, WHITE)
-    win.blit(back, (infoObject.current_w / 1.1, infoObject.current_h / 1.09))
+    win.blit(back, (infoObject.current_w / infoObject.current_w + 80, infoObject.current_h / infoObject.current_h + 35))
 
     if py.mouse.get_pressed()[0]:
         if backLeft <= mousePos[0] <= backRight and backTop <= mousePos[1] <= backBottom:
@@ -86,7 +86,7 @@ def menu():
         win.blit(play, (infoObject.current_w / 2.13, infoObject.current_h / 3.9))
 
         py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 2.7, buttonWidth, buttonHeight))
-        instructions = myFontBig.render("Instructions", False, WHITE)
+        instructions = myFontBig.render("How To Play", False, WHITE)
         win.blit(instructions, (infoObject.current_w / 2.4, infoObject.current_h / 2.6))
         
         py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 2.03, buttonWidth, buttonHeight))
@@ -128,7 +128,10 @@ def menu():
                 print("Login button clicked")
                 loginUser()
 
+        py.draw.rect(win, (64, 64, 64), (infoObject.current_w / infoObject.current_w + 15, 250, 450, 600))
+
         userDisplay()
+        levelXPDisplay()
         exit()
 
         py.display.update()

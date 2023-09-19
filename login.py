@@ -16,6 +16,7 @@ WHITE = (255, 255, 255)
 loggedIn = 'null'
 level = '0'
 xp = '0'
+xpToGo = '50'
 
 def loginUser():
 
@@ -73,9 +74,30 @@ def userDisplay():
     usern = myFont.render("Logged in as: " + loggedIn, False, WHITE)
     win.blit(usern, (infoObject.current_w - 350, 35))
 
+def levelUp():
+    global xp, xpToGo, level
+    if xp >= xpToGo:
+        xpToGo = int(xpToGo * 1.25)  #make sure to convert the result to an integer
+        xp = 0
+        level += 1
+
+        #connect to the database
+        connection = sqlite3.connect("user_credentials.db")
+        cursor = connection.cursor()
+
+        #update the user's level and xp in the database
+        cursor.execute("UPDATE users SET level=?, xp=? WHERE username=?", (level, xp, loggedIn))
+
+        #commit the changes and close the database connection
+        connection.commit()
+        connection.close()
+
 def levelXPDisplay():
     userLevel = myFont.render("Level: " + str(level), False, WHITE)
     win.blit(userLevel, (infoObject.current_w / infoObject.current_w + 35, 300))
 
     userXp = myFont.render("Experience: " + str(xp), False, WHITE)
     win.blit(userXp, (infoObject.current_w / infoObject.current_w + 35, 400))
+
+    xpLimit = myFont.render("/ " + str(xpToGo), False, WHITE)
+    win.blit(xpLimit, (infoObject.current_w / infoObject.current_w + 35, 445))

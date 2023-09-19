@@ -132,6 +132,7 @@ def menu():
 
         userDisplay()
         levelXPDisplay()
+        levelUp()
         exit()
 
         py.display.update()

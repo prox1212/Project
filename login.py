@@ -17,6 +17,7 @@ loggedIn = 'null'
 level = '0'
 xp = '0'
 xpToGo = '50'
+progressionW = '0'
 
 def loginUser():
 
@@ -75,24 +76,35 @@ def userDisplay():
     win.blit(usern, (infoObject.current_w - 350, 35))
 
 def levelUp():
-    global xp, xpToGo, level
+    global xp, xpToGo, level, loggedIn
+
+    # Convert xp and xpToGo to integers
+    xp = int(xp)
+    xpToGo = int(xpToGo)
+
     if xp >= xpToGo:
-        xpToGo = int(xpToGo * 1.25)  #make sure to convert the result to an integer
+        xpToGo = int(xpToGo * 1.25)
         xp = 0
         level += 1
 
-        #connect to the database
-        connection = sqlite3.connect("user_credentials.db")
-        cursor = connection.cursor()
+        try:
+            # Connect to the database
+            connection = sqlite3.connect("user_credentials.db")
+            cursor = connection.cursor()
 
-        #update the user's level and xp in the database
-        cursor.execute("UPDATE users SET level=?, xp=? WHERE username=?", (level, xp, loggedIn))
+            # Update the user's level and xp in the database
+            cursor.execute("UPDATE users SET level=?, xp=? WHERE username=?", (level, xp, loggedIn))
 
-        #commit the changes and close the database connection
-        connection.commit()
-        connection.close()
+            # Commit the changes and close the database connection
+            connection.commit()
+            connection.close()
+        except sqlite3.Error as e:
+            print("SQLite error:", e)
+        except Exception as ex:
+            print("Error:", ex)
 
 def levelXPDisplay():
+    global progressionW
     userLevel = myFont.render("Level: " + str(level), False, WHITE)
     win.blit(userLevel, (infoObject.current_w / infoObject.current_w + 35, 300))
 
@@ -101,3 +113,7 @@ def levelXPDisplay():
 
     xpLimit = myFont.render("/ " + str(xpToGo), False, WHITE)
     win.blit(xpLimit, (infoObject.current_w / infoObject.current_w + 35, 445))
+
+    progressionW = int(xp) * 250 / int(xpToGo)
+    py.draw.rect(win, (125, 125, 125), (infoObject.current_w / infoObject.current_w + 35, 550, 250, 15))
+    py.draw.rect(win, (0, 255, 0), (infoObject.current_w / infoObject.current_w + 35, 550, progressionW, 15))

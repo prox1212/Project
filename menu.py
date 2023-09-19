@@ -62,6 +62,17 @@ def exit():
 
     if py.mouse.get_pressed()[0]:
         if backLeft <= mousePos[0] <= backRight and backTop <= mousePos[1] <= backBottom:
+
+            connection = sqlite3.connect("user_credentials.db")
+            cursor = connection.cursor()
+
+            #update the user's level and xp in the database
+            cursor.execute("UPDATE users SET level=?, xp=? WHERE username=?", (level, xp, loggedIn))
+
+            #commit the changes and close the database connection
+            connection.commit()
+            connection.close()
+
             run = False
 
 def menu():

@@ -145,6 +145,9 @@ def levelXPDisplayInvert():
     py.draw.rect(win, (0, 255, 0), (infoObject.current_w - 350, 600, progressionW, 15))
 
 def ingameXpBar():
+    global progressionW
+    progressionW = int(xp) * 250 / int(xpToGo)  # Update progressionW based on current XP and XPToGo
+
     py.draw.rect(win, (125, 125, 125), (infoObject.current_w / 2.3, infoObject.current_h - 20, 250, 15))
     py.draw.rect(win, (0, 255, 0), (infoObject.current_w / 2.3, infoObject.current_h - 20, progressionW, 15))
 

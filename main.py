@@ -1,6 +1,7 @@
 import pygame as py
 from login import *
 from backButton import *
+from functions import *
 
 py.init()
 

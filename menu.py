@@ -3,6 +3,7 @@ from main import *
 from instructions import *
 from register import *
 from login import *
+from leaderboard import *
 
 py.init()
 
@@ -43,6 +44,11 @@ registerTop = infoObject.current_h / 1.62
 registerLeft = infoObject.current_w / 2.4
 registerBottom = infoObject.current_h / 1.62 + buttonHeight
 registerRight = infoObject.current_w / 2.4 + buttonWidth
+
+leaderboardTop = infoObject.current_h / 1.3
+leaderboardLeft = infoObject.current_w / 2.4
+leaderboardBottom = infoObject.current_h / 1.3 + buttonHeight
+leaderboardRight = infoObject.current_w / 2.4 + buttonWidth
 
 run = True
 
@@ -101,6 +107,10 @@ def menu():
         register = myFontBig.render("Register", False, WHITE)
         win.blit(register, (infoObject.current_w / 2.28, infoObject.current_h / 1.6))
 
+        py.draw.rect(win, (255, 0, 255), (infoObject.current_w / 2.4, infoObject.current_h / 1.3, buttonWidth, buttonHeight))
+        register = myFontBig.render("Leaderboard", False, WHITE)
+        win.blit(register, (infoObject.current_w / 2.4, infoObject.current_h / 1.28))
+
         test()
 
         # if py.mouse.get_pressed()[0]:
@@ -134,7 +144,12 @@ def menu():
                 print("Login button clicked")
                 loginUser()
 
-        py.draw.rect(win, (64, 64, 64), (infoObject.current_w / infoObject.current_w + 15, 250, 450, 600))
+        if py.mouse.get_pressed()[0]:
+            if leaderboardLeft <= mousePos[0] <= leaderboardRight and leaderboardTop <= mousePos[1] <= leaderboardBottom:
+                print("Leaderboard button clicked")
+                leaderboard()
+
+        py.draw.rect(win, (64, 64, 64), (infoObject.current_w / infoObject.current_w + 15, 250, 400, 600))
 
         userDisplay()
         levelXPDisplay()

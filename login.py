@@ -25,26 +25,26 @@ def loginUser():
         entered_username = username_entry.get()
         entered_password = password_entry.get()
 
-        # Connect to the database (or create it if it doesn't exist)
+        #connect to the database (or create it if it doesn't exist)
         connection = sqlite3.connect("user_credentials.db")
         cursor = connection.cursor()
 
-        # Create the table if it doesn't exist
+        #create the table if it doesn't exist
         cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0)")
 
-        # Check if the user credentials are valid
+        #check if the user credentials are valid
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, entered_password))
         user = cursor.fetchone()
 
         if user is not None:
             loggedIn = entered_username
-            level = user[2]  # Index 2 corresponds to the 'level' column in the database
-            xp = user[3]     # Index 3 corresponds to the 'xp' column in the database
+            level = user[2]  #index 2 corresponds to the level column in the database
+            xp = user[3]     #index 3 corresponds to the xp column in the database
             messagebox.showinfo("Login Successful", "Welcome, " + entered_username + "!")
         else:
             messagebox.showerror("Login Failed", "Invalid username or password.")
 
-        # Close the database connection
+        #close the database connection
         connection.close()
 
     root = tk.Tk()

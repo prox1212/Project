@@ -46,8 +46,9 @@ registerRight = infoObject.current_w / 2.4 + buttonWidth
 
 run = True
 
+
 def exit():
-    global run
+    global run, loggedIn, level, xp
 
     mousePos = py.mouse.get_pos()
 
@@ -63,16 +64,6 @@ def exit():
     if py.mouse.get_pressed()[0]:
         if backLeft <= mousePos[0] <= backRight and backTop <= mousePos[1] <= backBottom:
 
-            connection = sqlite3.connect("user_credentials.db")
-            cursor = connection.cursor()
-
-            #update the user's level and xp in the database
-            cursor.execute("UPDATE users SET level=?, xp=? WHERE username=?", (level, xp, loggedIn))
-
-            #commit the changes and close the database connection
-            connection.commit()
-            connection.close()
-
             run = False
 
 def menu():
@@ -83,6 +74,8 @@ def menu():
         for event in py.event.get():
             if event.type == py.QUIT:
                 run = False
+
+        keys = py.key.get_pressed()
 
         mousePos = py.mouse.get_pos()
 
@@ -107,6 +100,8 @@ def menu():
         py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 1.62, buttonWidth, buttonHeight))
         register = myFontBig.render("Register", False, WHITE)
         win.blit(register, (infoObject.current_w / 2.28, infoObject.current_h / 1.6))
+
+        test()
 
         # if py.mouse.get_pressed()[0]:
         #     if loggedIn == 'null':
@@ -144,6 +139,7 @@ def menu():
         userDisplay()
         levelXPDisplay()
         levelUp()
+        save()
         exit()
 
         py.display.update()

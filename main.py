@@ -50,6 +50,9 @@ def startGame():
         py.draw.rect(win, (255, 0, 255), (pos_x, pos_y, width, height))
 
         userDisplay()
+        test()
+        ingameXpBar()
+        levelUp()
         back()
 
         py.display.update()

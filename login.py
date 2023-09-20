@@ -91,7 +91,8 @@ def levelUp():
     xpToGo = int(xpToGo)
 
     if xp >= xpToGo:
-        xpToGo = int(xpToGo * xpGainMultiplier)
+        initialXP = int(xpToGo * xpGainMultiplier)
+        xpToGo = round(initialXP, -1)
         xp = 0
         level += 1
 

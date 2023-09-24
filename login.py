@@ -3,6 +3,7 @@ from tkinter import messagebox
 import sqlite3
 import pygame as py
 import threading
+from gameOver import *
 
 py.init()
 
@@ -208,6 +209,27 @@ def save():
                     print("SQLite error:", e)
                 except Exception as ex:
                     print("Error:", ex)
+health = 250
+realHealth = 100
+realHealth = str(realHealth)
+realHealthNum = int(realHealth)
+
+def healthBar():
+    global realHealth, realHealthNum
+    
+    decreaseHealth = realHealthNum * health / 100
+    py.draw.rect(win, (125, 125, 125), (20, 20, 250, 25))
+    py.draw.rect(win, (0, 255, 0), (20, 20, decreaseHealth, 25))
+    healthDisplay = myFontSmall.render(" | 100", False, WHITE)
+    realHealthDisplay = myFontSmall.render(str(realHealthNum), False, WHITE)
+    win.blit(healthDisplay, (45, 23))
+    win.blit(realHealthDisplay, (21, 23))
+
+    if realHealthNum <= 0:
+        run = False
+        gameOver()
+
+
 
 def test():
     global xp
@@ -215,3 +237,12 @@ def test():
 
     if keys[py.K_r]:
         xp += 1
+
+def test2():
+    global realHealth, realHealthNum
+    keys = py.key.get_pressed()
+
+    if keys[py.K_t]:
+        realHealthNum = int(realHealth)
+        realHealthNum -= 1
+        realHealth = str(realHealthNum)

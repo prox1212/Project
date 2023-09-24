@@ -15,8 +15,8 @@ py.display.set_caption("Dodge em all")
 width = 35
 height = 35
 
-pos_x = 0
-pos_y = 120
+pos_x = infoObject.current_w / 2
+pos_y = infoObject.current_h / 2
 
 velocity = 2.5
 velocityDiagonal = 0.2

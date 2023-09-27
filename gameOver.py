@@ -1,5 +1,4 @@
 import pygame as py
-from login import *
 
 py.init()
 

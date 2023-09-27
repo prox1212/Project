@@ -1,7 +1,8 @@
 import pygame as py
 import sqlite3
 from backButton import *
-from login import *
+from main import *
+#from login import *
 
 py.init()
 

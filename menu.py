@@ -2,7 +2,7 @@ import pygame as py
 from main import *
 from instructions import *
 from register import *
-from login import *
+#from login import *
 from leaderboard import *
 
 py.init()
@@ -154,7 +154,7 @@ def menu():
         userDisplay()
         levelXPDisplay()
         levelUp()
-        save()
+        #save()
         exit()
 
         py.display.update()

@@ -139,6 +139,20 @@ def healthBar():
         run = False
         gameOver()
 
+# def heal():
+#     global realHealth, pos_x, pos_y, stormSize, ticks
+
+#     # calculate the distance between the player and the center of the circle
+#     distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
+
+#     realHealth1 = int(realHealth)
+#     # check if the player is inside the circle
+#     if distance < stormSize:
+#         # increase health every 30 ticks if it's less than 100
+#         if realHealth1 < 100 and ticks % 30 == 0:
+#             realHealth += 1
+
+
 
 
 def levelUp():
@@ -265,7 +279,7 @@ def test4():
 run = True
 
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize
+    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance
     while run:
         py.time.delay(10)
         ticks += 1  # Increment ticks
@@ -314,6 +328,7 @@ def startGame():
         back()
         test3()
         test4()
+        #heal()
 
         py.display.update()
 

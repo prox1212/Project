@@ -154,7 +154,7 @@ def menu():
         userDisplay()
         levelXPDisplay()
         levelUp()
-        #save()
+        save()
         exit()
 
         py.display.update()

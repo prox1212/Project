@@ -1,7 +1,3 @@
-
-###############################################################
-#create function for healing inside circle
-###############################################################
 import pygame as py
 import tkinter as tk
 from tkinter import messagebox
@@ -127,6 +123,7 @@ def userBigDisplay():
 
 def healthBar():
     global realHealth, realHealthNum
+
     decreaseHealth = realHealthNum * health / 100
     py.draw.rect(win, (125, 125, 125), (20, 20, 250, 25))
     py.draw.rect(win, (0, 255, 0), (20, 20, decreaseHealth, 25))
@@ -139,19 +136,17 @@ def healthBar():
         run = False
         gameOver()
 
-# def heal():
-#     global realHealth, pos_x, pos_y, stormSize, ticks
+def heal():
+    global realHealthNum, pos_x, pos_y, stormSize, ticks, health
 
-#     # calculate the distance between the player and the center of the circle
-#     distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
+    # Calculate the distance between the player and the center of the circle
+    distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
 
-#     realHealth1 = int(realHealth)
-#     # check if the player is inside the circle
-#     if distance < stormSize:
-#         # increase health every 30 ticks if it's less than 100
-#         if realHealth1 < 100 and ticks % 30 == 0:
-#             realHealth += 1
-
+    # Check if the player is inside the circle
+    if distance < stormSize:
+        if realHealthNum < 100 and ticks % 30 == 0:
+            realHealthNum += 1
+            health += 1
 
 
 
@@ -244,6 +239,50 @@ def ingameXpBar():
 
 
 
+def save():
+    global loggedIn, level, xp, xpToGo
+
+    mousePos = py.mouse.get_pos()
+
+    saveTop = infoObject.current_h / infoObject.current_h + 150
+    saveLeft = infoObject.current_w / infoObject.current_w + 35
+    saveBottom = infoObject.current_h / infoObject.current_w + 35 + 70
+    saveRight = infoObject.current_w / infoObject.current_w + 35 + 200
+
+    py.draw.rect(win, (255, 0, 0), (infoObject.current_w / infoObject.current_w + 35, infoObject.current_h / infoObject.current_h + 150, 200, 70))
+    save = myFontBig.render("Save", False, WHITE)
+    win.blit(save, (infoObject.current_w / infoObject.current_w + 80, infoObject.current_h / infoObject.current_h + 150))
+
+    if py.mouse.get_pressed()[0]:
+        if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
+            if loggedIn != 'null':
+                try:
+                    # Connect to the database
+                    connection = sqlite3.connect("user_credentials.db")
+                    cursor = connection.cursor()
+
+                    # Get the user's current xp from the database
+                    cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
+                    current_xp = cursor.fetchone()[0]
+
+                    # Only update the database if the xp has changed
+                    if current_xp != xp:
+                        # Update the user's xp in the database
+                        cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
+
+                        # Commit the changes and close the database connection
+                        connection.commit()
+                        connection.close()
+                        print("XP saved successfully.")
+                    else:
+                        print("XP is unchanged. No update needed.")
+                except sqlite3.Error as e:
+                    print("SQLite error:", e)
+                except Exception as ex:
+                    print("Error:", ex)
+
+
+
 def test():
     global xp
     keys = py.key.get_pressed()
@@ -279,7 +318,7 @@ def test4():
 run = True
 
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance
+    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth
     while run:
         py.time.delay(10)
         ticks += 1  # Increment ticks
@@ -328,7 +367,7 @@ def startGame():
         back()
         test3()
         test4()
-        #heal()
+        heal()
 
         py.display.update()
 

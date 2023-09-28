@@ -50,7 +50,7 @@ transparent_surface = py.Surface((infoObject.current_w, infoObject.current_h), p
 transparent_surface.set_alpha(alpha_value)
 py.draw.rect(transparent_surface, (16, 6, 48, alpha_value), transparent_surface.get_rect())  # Cover the entire screen with transparency
 
-stormSize = 350
+stormSize = 800
 
 durability = 250
 realDurability = 500
@@ -131,7 +131,7 @@ def healthBarBurner():
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
-    py.draw.rect(win, (0, 255, 0), (20, 100, decreaseDurability, 25))
+    py.draw.rect(win, (255, 140, 0), (20, 100, decreaseDurability, 25))
     durabilityDisplay = myFontSmall.render(" | 500", False, WHITE)
     realDurabilityDisplay = myFontSmall.render(str(realDurabilityNum), False, WHITE)
     burner = myFontMedium.render("Burner", False, WHITE)
@@ -325,12 +325,23 @@ def test4():
     if keys[py.K_i]:
         stormSize += 1
 
+def test5():
+    global realDurability, realDurabilityNum
+    keys = py.key.get_pressed()
+
+    if keys[py.K_p]:
+        realDurabilityNum = int(realDurability)
+        realDurabilityNum += 1
+        realDurability = str(realDurabilityNum)
+
 
 
 run = True
 
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health
+    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability
+    initialStormSize = 800  # Initial stormSize value
+    
     while run:
         py.time.delay(10)
         ticks += 1  # Increment ticks
@@ -361,23 +372,33 @@ def startGame():
         # Draw the transparent overlay
         win.blit(transparent_surface, (0, 0))
 
-        # Draw the storm (circle)
-        py.draw.circle(win, (53, 120, 2), (infoObject.current_w // 2, infoObject.current_h // 2), stormSize)
+        # Calculate the adjusted stormSize based on durability
+        adjustedStormSize = initialStormSize * (realDurabilityNum / 500)
+
+        # Draw the storm (circle) with the adjusted size
+        py.draw.circle(win, (53, 120, 2), (infoObject.current_w // 2, infoObject.current_h // 2), int(adjustedStormSize))
 
         py.draw.rect(win, (255, 0, 255), (pos_x, pos_y, width, height))
 
+        if ticks % 7 == 0:
+            realDurabilityNum -= 1
+            realDurability = str(realDurabilityNum)
+
         # Check if the player is outside the green circle (double the radius) and 100 ticks have passed
-        if distance > stormSize and ticks % 100 == 0:
+        if distance > adjustedStormSize and ticks % 100 == 0:
             realHealthNum -= 5
             realHealth = str(realHealthNum)
 
         distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
 
         # Check if the player is inside the circle
-        if distance < stormSize:
+        if distance < adjustedStormSize:
             if realHealthNum < 100 and ticks % 30 == 0:
                 realHealthNum += 1
                 realHealth = str(realHealthNum)
+
+        if ticks % 35 == 0:
+            xp += 1
 
         test()
         ingameXpBar()
@@ -387,8 +408,8 @@ def startGame():
         back()
         test3()
         test4()
-        #heal()
         healthBarBurner()
+        test5()
 
         py.display.update()
 

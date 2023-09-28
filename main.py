@@ -52,6 +52,11 @@ py.draw.rect(transparent_surface, (16, 6, 48, alpha_value), transparent_surface.
 
 stormSize = 350
 
+durability = 250
+realDurability = 500
+realDurability = str(realDurability)
+realDurabilityNum = int(realDurability)
+
 
 
 ticks = 0  # To keep track of ticks
@@ -121,7 +126,24 @@ def userBigDisplay():
 
 
 
-def healthBar():
+def healthBarBurner():
+    global realDurability, realDurabilityNum
+
+    decreaseDurability = realDurabilityNum * durability / 500
+    py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
+    py.draw.rect(win, (0, 255, 0), (20, 100, decreaseDurability, 25))
+    durabilityDisplay = myFontSmall.render(" | 500", False, WHITE)
+    realDurabilityDisplay = myFontSmall.render(str(realDurabilityNum), False, WHITE)
+    burner = myFontMedium.render("Burner", False, WHITE)
+    win.blit(durabilityDisplay, (45, 100))
+    win.blit(realDurabilityDisplay, (21, 100))
+    win.blit(burner, (21, 70))
+
+    if realDurabilityNum <= 0:
+        run = False
+        gameOver()
+
+def healthBarPlayer():
     global realHealth, realHealthNum
 
     decreaseHealth = realHealthNum * health / 100
@@ -137,18 +159,6 @@ def healthBar():
     if realHealthNum <= 0:
         run = False
         gameOver()
-
-def heal():
-    global realHealthNum, pos_x, pos_y, stormSize, ticks, health
-
-    # Calculate the distance between the player and the center of the circle
-    distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
-
-    # Check if the player is inside the circle
-    if distance < stormSize:
-        if realHealthNum < 100 and ticks % 30 == 0:
-            realHealthNum += 1
-            health += 1
 
 
 
@@ -320,7 +330,7 @@ def test4():
 run = True
 
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth
+    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health
     while run:
         py.time.delay(10)
         ticks += 1  # Increment ticks
@@ -361,15 +371,24 @@ def startGame():
             realHealthNum -= 5
             realHealth = str(realHealthNum)
 
+        distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
+
+        # Check if the player is inside the circle
+        if distance < stormSize:
+            if realHealthNum < 100 and ticks % 30 == 0:
+                realHealthNum += 1
+                realHealth = str(realHealthNum)
+
         test()
         ingameXpBar()
         levelUp()
-        healthBar()
+        healthBarPlayer()
         test2()
         back()
         test3()
         test4()
-        heal()
+        #heal()
+        healthBarBurner()
 
         py.display.update()
 

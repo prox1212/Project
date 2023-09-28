@@ -125,12 +125,14 @@ def healthBar():
     global realHealth, realHealthNum
 
     decreaseHealth = realHealthNum * health / 100
-    py.draw.rect(win, (125, 125, 125), (20, 20, 250, 25))
-    py.draw.rect(win, (0, 255, 0), (20, 20, decreaseHealth, 25))
+    py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
+    py.draw.rect(win, (0, 255, 0), (20, 40, decreaseHealth, 25))
     healthDisplay = myFontSmall.render(" | 100", False, WHITE)
     realHealthDisplay = myFontSmall.render(str(realHealthNum), False, WHITE)
-    win.blit(healthDisplay, (45, 23))
-    win.blit(realHealthDisplay, (21, 23))
+    player = myFontMedium.render("" + loggedIn, False, WHITE)
+    win.blit(healthDisplay, (45, 43))
+    win.blit(realHealthDisplay, (21, 43))
+    win.blit(player, (21, 10))
 
     if realHealthNum <= 0:
         run = False

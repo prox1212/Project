@@ -28,6 +28,7 @@ level = 1
 xp = 0
 xpToGo = 50
 xpGainMultiplier = 1.2
+currency = 0
 
 width = 35
 height = 35
@@ -67,7 +68,7 @@ def loginUser():
 
     def check_login():
 
-        global loggedIn, entered_username, level, xp, xpToGo
+        global loggedIn, entered_username, level, xp, xpToGo, currency
         entered_username = username_entry.get()
         entered_password = password_entry.get()
 
@@ -76,7 +77,7 @@ def loginUser():
         cursor = connection.cursor()
 
         #create the table if it doesn't exist
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, currency INTEGER DEFAULT 0)")
 
         #check if the user credentials are valid
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, entered_password))
@@ -87,6 +88,7 @@ def loginUser():
             level = user[2]  #index 2 corresponds to the level column in the database
             xp = user[3]     #index 3 corresponds to the xp column in the database
             xpToGo = user[4]
+            currency = user[5]
             messagebox.showinfo("Login Successful", "Welcome, " + entered_username + "!")
         else:
             messagebox.showerror("Login Failed", "Invalid username or password.")
@@ -163,7 +165,7 @@ def healthBarPlayer():
 
 
 def levelUp():
-    global xp, xpToGo, level, loggedIn
+    global xp, xpToGo, level, loggedIn, currency
 
     xp = int(xp)
     xpToGo = int(xpToGo)
@@ -173,6 +175,7 @@ def levelUp():
         xpToGo = round(initialXP, -1)
         xp = 0
         level += 1
+        currency += 20
 
         # Move database update to a separate thread
         def update_database():
@@ -180,7 +183,7 @@ def levelUp():
                 connection = sqlite3.connect("user_credentials.db")
                 cursor = connection.cursor()
 
-                cursor.execute("UPDATE users SET level=?, xp=?, xpToGo=? WHERE username=?", (level, xp, xpToGo, loggedIn))
+                cursor.execute("UPDATE users SET level=?, xp=?, xpToGo=?, currency=? WHERE username=?", (level, xp, xpToGo, currency, loggedIn))
 
                 connection.commit()
                 connection.close()
@@ -212,6 +215,11 @@ def levelXPDisplay():
     progressionW = int(xp) * 250 / int(xpToGo)
     py.draw.rect(win, (125, 125, 125), (infoObject.current_w / infoObject.current_w + 35, 600, 250, 15))
     py.draw.rect(win, (0, 255, 0), (infoObject.current_w / infoObject.current_w + 35, 600, progressionW, 15))
+
+
+def currencyDisplay():
+    usern = myFont.render("Eddies: " + str(currency), False, WHITE)
+    win.blit(usern, (infoObject.current_w - 350, 100))
 
 
 
@@ -274,7 +282,7 @@ def save():
                     cursor = connection.cursor()
 
                     # Get the user's current xp from the database
-                    cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
+                    cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn))
                     current_xp = cursor.fetchone()[0]
 
                     # Only update the database if the xp has changed

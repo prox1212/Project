@@ -1,4 +1,5 @@
 import pygame as py
+from backButton import *
 
 py.init()
 
@@ -51,10 +52,10 @@ def gameOver():
         title = myFontBig.render("Game Over", False, WHITE)
         win.blit(title, (infoObject.current_w / 2.3, 60))
 
-        body = myFont.render("Your level progression has been saved.", False, WHITE)
-        win.blit(body, (infoObject.current_w / 2.9, 165))
+        body = myFont.render("Your level progression has been saved. Exit to play again", False, WHITE)
+        win.blit(body, (infoObject.current_w / 3, 165))
 
-        exit()
+        back()
 
         py.display.update()
 

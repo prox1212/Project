@@ -156,6 +156,7 @@ def menu():
         levelUp()
         save()
         exit()
+        currencyDisplay()
 
         py.display.update()
 

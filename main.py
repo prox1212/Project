@@ -285,6 +285,9 @@ def save():
                     cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn))
                     current_xp = cursor.fetchone()[0]
 
+                    cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn))
+                    current_currency = cursor.fetchone()[0]
+
                     # Only update the database if the xp has changed
                     if current_xp != xp:
                         # Update the user's xp in the database
@@ -294,6 +297,14 @@ def save():
                         connection.commit()
                         connection.close()
                         print("XP saved successfully.")
+
+                    if current_currency != currency:
+                        cursor.execute("UPDATE users SET currency=? WHERE username=?", (currency, loggedIn))
+
+                        connection.commit()
+                        connection.close()
+                        print("currency saved successfully.")
+
                     else:
                         print("XP is unchanged. No update needed.")
                 except sqlite3.Error as e:

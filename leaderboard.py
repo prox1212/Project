@@ -10,7 +10,7 @@ py.init()
 infoObject = py.display.Info()
 win = py.display.set_mode((infoObject.current_w, infoObject.current_h))
 
-py.display.set_caption("Dodge em all")
+py.display.set_caption("Fight the Storm")
 
 py.font.init()
 myFont = py.font.SysFont('Comic Sans MS', 16)

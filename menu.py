@@ -11,7 +11,7 @@ py.init()
 infoObject = py.display.Info()
 win = py.display.set_mode((infoObject.current_w, infoObject.current_h))
 
-py.display.set_caption("Dodge em all")
+py.display.set_caption("Fight the Storm")
 
 py.font.init()
 myFont = py.font.SysFont('Comic Sans MS', 16)
@@ -114,12 +114,12 @@ def menu():
         test()
 
         # if py.mouse.get_pressed()[0]:
-        #     if loggedIn == 'null':
-        #         print("Login null")
+        #     if loggedIn == 'nul':
+        #         print("Login nul")
         #         toPlay = myFontBig.render("You need to login to play!", False, WHITE)
         #         win.blit(toPlay, (infoObject.current_w / 2.6, infoObject.current_h / 1.2))
 
-        #     if loggedIn != 'null':
+        #     if loggedIn != 'nul':
         #         if playLeft <= mousePos[0] <= playRight and playTop <= mousePos[1] <= playBottom:
         #             print("Play button clicked")
         #             startGame()

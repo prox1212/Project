@@ -29,6 +29,7 @@ xp = 0
 xpToGo = 50
 xpGainMultiplier = 1.2
 currency = 0
+isAdmin = 0
 
 width = 35
 height = 35
@@ -68,7 +69,7 @@ def loginUser():
 
     def check_login():
 
-        global loggedIn, entered_username, level, xp, xpToGo, currency
+        global loggedIn, entered_username, level, xp, xpToGo, currency, isAdmin
         entered_username = username_entry.get()
         entered_password = password_entry.get()
 
@@ -77,7 +78,7 @@ def loginUser():
         cursor = connection.cursor()
 
         #create the table if it doesn't exist
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0)")
 
         #check if the user credentials are valid
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, entered_password))
@@ -89,6 +90,7 @@ def loginUser():
             xp = user[3]     #index 3 corresponds to the xp column in the database
             xpToGo = user[4]
             currency = user[5]
+            isAdmin = user[6]
             messagebox.showinfo("Login Successful", "Welcome, " + entered_username + "!")
         else:
             messagebox.showerror("Login Failed", "Invalid username or password.")
@@ -327,44 +329,30 @@ def save():
 
 
 
-def test():
-    global xp
+def admin():
+    global xp, realHealth, realHealthNum, stormSize, realDurability, realDurabilityNum
     keys = py.key.get_pressed()
 
-    if keys[py.K_r]:
-        xp += 1
+    if isAdmin == 1:
 
-def test2():
-    global realHealth, realHealthNum
-    keys = py.key.get_pressed()
+        if keys[py.K_r]:
+            xp += 1
 
-    if keys[py.K_t]:
-        realHealthNum = int(realHealth)
-        realHealthNum -= 1
-        realHealth = str(realHealthNum)
+        if keys[py.K_t]:
+            realHealthNum = int(realHealth)
+            realHealthNum -= 1
+            realHealth = str(realHealthNum)
 
-def test3():
-    global stormSize
-    keys = py.key.get_pressed()
+        if keys[py.K_o]:
+            stormSize -= 1
 
-    if keys[py.K_o]:
-        stormSize -= 1
+        if keys[py.K_i]:
+            stormSize += 1
 
-def test4():
-    global stormSize
-    keys = py.key.get_pressed()
-
-    if keys[py.K_i]:
-        stormSize += 1
-
-def test5():
-    global realDurability, realDurabilityNum
-    keys = py.key.get_pressed()
-
-    if keys[py.K_p]:
-        realDurabilityNum = int(realDurability)
-        realDurabilityNum += 1
-        realDurability = str(realDurabilityNum)
+        if keys[py.K_p]:
+            realDurabilityNum = int(realDurability)
+            realDurabilityNum += 1
+            realDurability = str(realDurabilityNum)
 
 
 
@@ -432,16 +420,12 @@ def startGame():
         if ticks % 35 == 0:
             xp += 1
 
-        test()
         ingameXpBar()
         levelUp()
         healthBarPlayer()
-        test2()
         back()
-        test3()
-        test4()
         healthBarBurner()
-        test5()
+        admin()
 
         py.display.update()
 

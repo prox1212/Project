@@ -111,7 +111,7 @@ def menu():
         register = myFontBig.render("Leaderboard", False, WHITE)
         win.blit(register, (infoObject.current_w / 2.4, infoObject.current_h / 1.28))
 
-        test()
+        admin()
 
         # if py.mouse.get_pressed()[0]:
         #     if loggedIn == 'nul':

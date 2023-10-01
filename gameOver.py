@@ -52,8 +52,8 @@ def gameOver():
         title = myFontBig.render("Game Over", False, WHITE)
         win.blit(title, (infoObject.current_w / 2.3, 60))
 
-        body = myFont.render("Your level progression has been saved. Exit to play again", False, WHITE)
-        win.blit(body, (infoObject.current_w / 3, 165))
+        body = myFont.render("To save your progression, press the 'save' button in the menu. Exit to play again", False, WHITE)
+        win.blit(body, (infoObject.current_w / 3.9, 165))
 
         back()
 

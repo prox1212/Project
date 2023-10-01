@@ -20,6 +20,13 @@ myFontBig = py.font.SysFont('Comic Sans MS', 50)
 WHITE = (255, 255, 255)
 GREY = (201, 201, 199)
 
+def createDatabase():
+    connection = sqlite3.connect("user_credentials.db")
+    cursor = connection.cursor()
+
+    cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0)")
+    connection.close()
+
 def displayLeaderboard():
     # Connect to the database
     connection = sqlite3.connect("user_credentials.db")
@@ -67,6 +74,7 @@ def leaderboard():
 
             py.draw.rect(win, (64, 64, 64), (infoObject.current_w - 380, 250, 350, 600))
 
+            createDatabase()
             displayLeaderboard()
             userBigDisplay()
             levelXPDisplayInvert()

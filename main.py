@@ -77,7 +77,7 @@ def loginUser():
         cursor = connection.cursor()
 
         #create the table if it doesn't exist
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, currency INTEGER DEFAULT 0)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0)")
 
         #check if the user credentials are valid
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, entered_password))
@@ -129,7 +129,7 @@ def userBigDisplay():
 
 
 def healthBarBurner():
-    global realDurability, realDurabilityNum
+    global realDurability, realDurabilityNum, realHealthNum
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
@@ -143,10 +143,12 @@ def healthBarBurner():
 
     if realDurabilityNum <= 0:
         run = False
+        realDurabilityNum = 500
+        realHealthNum = 100
         gameOver()
 
 def healthBarPlayer():
-    global realHealth, realHealthNum
+    global realHealth, realHealthNum, realDurabilityNum
 
     decreaseHealth = realHealthNum * health / 100
     py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
@@ -160,6 +162,8 @@ def healthBarPlayer():
 
     if realHealthNum <= 0:
         run = False
+        realDurabilityNum = 500
+        realHealthNum = 100
         gameOver()
 
 
@@ -264,17 +268,18 @@ def save():
 
     mousePos = py.mouse.get_pos()
 
-    saveTop = infoObject.current_h / infoObject.current_h + 150
-    saveLeft = infoObject.current_w / infoObject.current_w + 35
-    saveBottom = infoObject.current_h / infoObject.current_w + 35 + 70
-    saveRight = infoObject.current_w / infoObject.current_w + 35 + 200
+    saveTop = 135
+    saveLeft = 35
+    saveBottom = saveTop + 70
+    saveRight = saveLeft + 200
 
-    py.draw.rect(win, (255, 0, 0), (infoObject.current_w / infoObject.current_w + 35, infoObject.current_h / infoObject.current_h + 150, 200, 70))
+    py.draw.rect(win, (255, 0, 0), (saveLeft, saveTop, 200, 70))
     save = myFontBig.render("Save", False, WHITE)
-    win.blit(save, (infoObject.current_w / infoObject.current_w + 80, infoObject.current_h / infoObject.current_h + 150))
+    win.blit(save, (saveLeft + 45, saveTop - 5))
 
     if py.mouse.get_pressed()[0]:
         if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
+            print("Save button clicked")
             if loggedIn != 'null':
                 try:
                     # Connect to the database
@@ -282,10 +287,10 @@ def save():
                     cursor = connection.cursor()
 
                     # Get the user's current xp from the database
-                    cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn))
+                    cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
                     current_xp = cursor.fetchone()[0]
 
-                    cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn))
+                    cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn,))
                     current_currency = cursor.fetchone()[0]
 
                     # Only update the database if the xp has changed

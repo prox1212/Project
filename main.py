@@ -23,7 +23,7 @@ py.display.set_caption("Dodge em all")
 
 # player info
 
-loggedIn = 'null'
+loggedIn = 'nul'
 level = 1
 xp = 0
 xpToGo = 50
@@ -179,7 +179,15 @@ def levelUp():
         xpToGo = round(initialXP, -1)
         xp = 0
         level += 1
-        currency += 20
+        
+        if level % 10 == 0:
+            currency += 100
+
+        elif level % 5 == 0:
+            currency += 50
+
+        else:
+            currency += 20
 
         # Move database update to a separate thread
         def update_database():
@@ -280,7 +288,7 @@ def save():
     if py.mouse.get_pressed()[0]:
         if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
             print("Save button clicked")
-            if loggedIn != 'null':
+            if loggedIn != 'nul':
                 try:
                     # Connect to the database
                     connection = sqlite3.connect("user_credentials.db")

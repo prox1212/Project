@@ -5,7 +5,6 @@ import sqlite3
 import threading
 #from login import *
 from backButton import *
-from gameOver import *
 
 py.init()
 
@@ -30,6 +29,7 @@ xpToGo = 50
 xpGainMultiplier = 1.2
 currency = 0
 isAdmin = 0
+over = False
 
 width = 35
 height = 35
@@ -130,8 +130,93 @@ def userBigDisplay():
 
 
 
+def gameOver():
+    global loggedIn, level, xp, xpToGo, run, realHealthNum, realDurabilityNum
+
+    # Create a semi-transparent black surface
+    game_over_surface = py.Surface((1450, 700), py.SRCALPHA)
+    game_over_surface.fill((0, 0, 0, 178))  # The fourth value (178) controls opacity (0-255)
+
+    # Draw the semi-transparent black surface on the screen
+    win.blit(game_over_surface, (250, 175))
+
+    title = myFontBig.render("Game Over", False, WHITE)
+    win.blit(title, (850, 180))
+
+    mousePos = py.mouse.get_pos()
+
+    saveTop = 765
+    saveLeft = 300
+    saveBottom = saveTop + 70
+    saveRight = saveLeft + 200
+
+    menuTop = 765
+    menuLeft = 1445
+    menuBottom = menuTop + 70
+    menuRight = menuLeft + 200
+
+    py.draw.rect(win, (255, 0, 0), (saveLeft, saveTop, 200, 70))
+    save = myFontBig.render("Save", False, WHITE)
+    win.blit(save, (saveLeft + 45, saveTop - 5))
+
+    if py.mouse.get_pressed()[0]:
+        if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
+            print("Save button clicked")
+            if loggedIn != 'nul':
+                try:
+                    # Connect to the database
+                    connection = sqlite3.connect("user_credentials.db")
+                    cursor = connection.cursor()
+
+                    # Get the user's current xp from the database
+                    cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
+                    current_xp = cursor.fetchone()[0]
+
+                    cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn,))
+                    current_currency = cursor.fetchone()[0]
+
+                    # Only update the database if the xp has changed
+                    if current_xp != xp:
+                        # Update the user's xp in the database
+                        cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
+
+                        # Commit the changes and close the database connection
+                        connection.commit()
+                        connection.close()
+                        print("XP saved successfully.")
+
+                    if current_currency != currency:
+                        cursor.execute("UPDATE users SET currency=? WHERE username=?", (currency, loggedIn))
+
+                        connection.commit()
+                        connection.close()
+                        print("currency saved successfully.")
+
+                    else:
+                        print("XP is unchanged. No update needed.")
+                except sqlite3.Error as e:
+                    print("SQLite error:", e)
+                except Exception as ex:
+                    print("Error:", ex)
+
+    
+    py.draw.rect(win, (255, 0, 0), (menuLeft, menuTop, 200, 70))
+    menu = myFontBig.render("Menu", False, WHITE)
+    win.blit(menu, (menuLeft + 45, menuTop - 5))
+
+    if py.mouse.get_pressed()[0]:
+        if menuLeft <= mousePos[0] <= menuRight and menuTop <= mousePos[1] <= menuBottom:
+            print("Menu button clicked")
+            realDurabilityNum = 500
+            realHealthNum = 100
+            import menu
+            menu.menu()
+            run = False
+
+
+
 def healthBarBurner():
-    global realDurability, realDurabilityNum, realHealthNum
+    global realDurability, realDurabilityNum, realHealthNum, over
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
@@ -144,13 +229,11 @@ def healthBarBurner():
     win.blit(burner, (21, 70))
 
     if realDurabilityNum <= 0:
-        run = False
-        realDurabilityNum = 500
-        realHealthNum = 100
+        over = True
         gameOver()
 
 def healthBarPlayer():
-    global realHealth, realHealthNum, realDurabilityNum
+    global realHealth, realHealthNum, realDurabilityNum, over
 
     decreaseHealth = realHealthNum * health / 100
     py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
@@ -163,9 +246,7 @@ def healthBarPlayer():
     win.blit(player, (21, 10))
 
     if realHealthNum <= 0:
-        run = False
-        realDurabilityNum = 500
-        realHealthNum = 100
+        over = True
         gameOver()
 
 
@@ -400,25 +481,32 @@ def startGame():
 
         py.draw.rect(win, (255, 0, 255), (pos_x, pos_y, width, height))
 
-        if ticks % 7 == 0:
-            realDurabilityNum -= 1
-            realDurability = str(realDurabilityNum)
+        if ticks % 7 == 0 and realDurabilityNum:
+
+            if realDurabilityNum > 0 and realHealthNum > 0:
+                realDurabilityNum -= 1
+                realDurability = str(realDurabilityNum)
 
         # Check if the player is outside the green circle (double the radius) and 100 ticks have passed
         if distance > adjustedStormSize and ticks % 100 == 0:
-            realHealthNum -= 5
-            realHealth = str(realHealthNum)
+
+            if realHealthNum > 0 and realDurabilityNum > 0:
+                realHealthNum -= 5
+                realHealth = str(realHealthNum)
 
         distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
 
         # Check if the player is inside the circle
         if distance < adjustedStormSize:
             if realHealthNum < 100 and ticks % 30 == 0:
-                realHealthNum += 1
-                realHealth = str(realHealthNum)
+                if realHealthNum > 0 and realDurabilityNum > 0:
+                    realHealthNum += 1
+                    realHealth = str(realHealthNum)
 
         if ticks % 35 == 0:
-            xp += 1
+
+            if realHealthNum > 0 and realDurabilityNum > 0:
+                xp += 1
 
         ingameXpBar()
         levelUp()

@@ -39,8 +39,12 @@ def displayLeaderboard():
     # Display the leaderboard data on the screen
     yOffset = 200
     for i, (username, player_level) in enumerate(leaderboard_data, start=1):
-        leaderboardEntry = myFontMedium.render(f"       {i})                {username}              -               Level {player_level}", False, GREY)
-        win.blit(leaderboardEntry, (infoObject.current_w / infoObject.current_w + 35, infoObject.current_h / infoObject.current_h + yOffset))
+        leaderboardEntryRank = myFontMedium.render(f"{i}", False, GREY)
+        leaderboardEntryName = myFontMedium.render(f"{username}", False, GREY)
+        leaderboardEntryLevel = myFontMedium.render(f"{player_level}", False, GREY)
+        win.blit(leaderboardEntryRank, (infoObject.current_w / infoObject.current_w + 90, infoObject.current_h / infoObject.current_h + yOffset))
+        win.blit(leaderboardEntryName, (infoObject.current_w / infoObject.current_w + 300, infoObject.current_h / infoObject.current_h + yOffset))
+        win.blit(leaderboardEntryLevel, (infoObject.current_w / infoObject.current_w + 660, infoObject.current_h / infoObject.current_h + yOffset))
         yOffset += 60
 
     # Close the database connection
@@ -60,7 +64,7 @@ def leaderboard():
 
             win.fill((16, 6, 48))
 
-            title = myFontBig.render("Learderboard", False, WHITE)
+            title = myFontBig.render("Leaderboard", False, WHITE)
             win.blit(title, (infoObject.current_w / infoObject.current_w + 80, infoObject.current_h / infoObject.current_h + 35))
 
             rank = myFontMedium.render("Rank", False, WHITE)

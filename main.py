@@ -1,4 +1,5 @@
 import pygame as py
+import pygame.time
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
@@ -436,7 +437,6 @@ def admin():
             realDurability = str(realDurabilityNum)
 
 
-
 run = True
 
 def startGame():
@@ -446,6 +446,12 @@ def startGame():
     while run:
         py.time.delay(10)
         ticks += 1  # Increment ticks
+
+        #start_time = 0
+
+        #def time():
+            #global start_time
+            #start_time = py.time.get_ticks()
 
         for event in py.event.get():
             if event.type == py.QUIT:
@@ -464,6 +470,23 @@ def startGame():
 
         if keys[py.K_DOWN] or keys[py.K_s] and pos_y < infoObject.current_h - height:
             pos_y += velocity
+
+        #current_time = py.time.get_ticks()  # Get the current time in milliseconds
+
+        # Calculate the elapsed time in milliseconds
+        #elapsed_time = current_time - start_time
+
+        # Calculate minutes and seconds
+        #minutes = (elapsed_time // 1000) // 60
+        #seconds = (elapsed_time // 1000) % 60
+
+        # Format the timer as "00:00"
+        #timer_text = f"{minutes:02}:{seconds:02}"
+
+        #py.time.delay(10)
+        #ticks += 1  # Increment ticks
+
+
 
         # Calculate the distance between the player and the center of the circle
         distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
@@ -508,12 +531,32 @@ def startGame():
             if realHealthNum > 0 and realDurabilityNum > 0:
                 xp += 1
 
+        if ticks % 6000 == 0:
+
+            if realHealthNum > 0 and realDurabilityNum > 0:
+                xp += 150
+
+        if ticks % 18000 == 0:
+
+            if realHealthNum > 0 and realDurabilityNum > 0:
+                xp += 450
+
+        if ticks % 30000 == 0:
+
+            if realHealthNum > 0 and realDurabilityNum > 0:
+                xp += 1000
+
+
+        #timer_display = myFont.render("Time: " + timer_text, False, WHITE)
+        #win.blit(timer_display, (infoObject.current_w / 2.3, 40))
+
         ingameXpBar()
         levelUp()
         healthBarPlayer()
         back()
         healthBarBurner()
         admin()
+        #time()
 
         py.display.update()
 

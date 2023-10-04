@@ -598,7 +598,7 @@ def startGame():
                 interact = myFontMedium.render("Press 'E' to add wood", False, WHITE)
                 win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 200))
 
-                if keys[py.K_e] and time_since_last_wood_addition >= 600:
+                if keys[py.K_e] and time_since_last_wood_addition >= 500:
                     woodCount -= 1
                     realDurabilityNum += 25
                     last_wood_addition_time = current_time

@@ -32,6 +32,7 @@ xpGainMultiplier = 1.2
 currency = 0
 isAdmin = 0
 over = False
+woodCount = 0
 
 width = 35
 height = 35
@@ -229,6 +230,9 @@ def healthBarBurner():
     win.blit(durabilityDisplay, (45, 100))
     win.blit(realDurabilityDisplay, (21, 100))
     win.blit(burner, (21, 70))
+
+    if realDurabilityNum > 500:
+        realDurabilityNum = 500
 
     if realDurabilityNum <= 0:
         over = True
@@ -437,11 +441,36 @@ def admin():
             realDurabilityNum += 1
             realDurability = str(realDurabilityNum)
 
+woodFlag = True
+wood2Flag = True
+
+woodX = random.randint(5, 1800)
+woodY = random.randint(5, 1000)
+
+wood2X = random.randint(5, 1800)
+wood2Y = random.randint(5, 1000)
+
+def wood():
+    if woodFlag == True:
+        image = pygame.image.load(r'Assets/planks.png')
+        image = pygame.transform.scale(image, (75, 75))
+        win.blit(image, (woodX, woodY))
+
+def wood2():
+    if wood2Flag == True:
+        image = pygame.image.load(r'Assets/planks.png')
+        image = pygame.transform.scale(image, (75, 75))
+        win.blit(image, (wood2X, wood2Y))
+
+def woodCounter():
+    count = myFontMedium.render("Wood: " + str(woodCount), False, WHITE)
+    win.blit(count, (infoObject.current_w - 150, 45))
+
 
 run = True
 
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, point_counter, current_spawn_ticks
+    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag, woodX, woodY, woodCount, wood2Flag, wood2X, wood2Y
     initialStormSize = 800  # Initial stormSize value
     
     while run:
@@ -487,7 +516,10 @@ def startGame():
         #py.time.delay(10)
         #ticks += 1  # Increment ticks
 
-
+        playerTop = pos_x
+        playerLeft = pos_y
+        playerBottom = pos_x + width
+        playerRight = pos_y + height
 
         # Calculate the distance between the player and the center of the circle
         distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
@@ -552,6 +584,48 @@ def startGame():
         text = myFontSmall.render("Burner", False, WHITE)
         win.blit(text, (infoObject.current_w / 2 - 30, infoObject.current_h / 2 - 15))
 
+        burnerTop = infoObject.current_w / 2 - 35
+        burnerLeft = infoObject.current_h / 2 - 35
+        burnerBottom = infoObject.current_w / 2 - 35 + 70
+        burnerRight = infoObject.current_h / 2 - 35 + 70
+
+        if playerRight >= burnerLeft and playerLeft <= burnerRight and playerBottom >= burnerTop and playerTop <= burnerBottom:
+            if woodCount > 0:
+                interact = myFontMedium.render("Press 'E' to add wood", False, WHITE)
+                win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 200))
+
+                if keys[py.K_e]:
+                    woodCount -= 1
+                    realDurabilityNum += 100
+
+        woodTop = woodX
+        woodLeft = woodY
+        woodBottom = woodX + 75
+        woodRight = woodY + 75
+
+        wood2Top = wood2X
+        wood2Left = wood2Y
+        wood2Bottom = wood2X + 75
+        wood2Right = wood2Y + 75
+
+        if playerRight >= woodLeft and playerLeft <= woodRight and playerBottom >= woodTop and playerTop <= woodBottom:
+            woodFlag = False
+            woodCount += 1
+
+        if woodFlag == False:
+            woodX = random.randint(5, 1915)
+            woodY = random.randint(5, 1075)
+            woodFlag = True
+
+        if playerRight >= wood2Left and playerLeft <= wood2Right and playerBottom >= wood2Top and playerTop <= wood2Bottom:
+            wood2Flag = False
+            woodCount += 1
+
+        if wood2Flag == False:
+            wood2X = random.randint(5, 1915)
+            wood2Y = random.randint(5, 1075)
+            wood2Flag = True
+
 
         #wood
         # if ticks % 200 == 0:
@@ -572,6 +646,9 @@ def startGame():
         healthBarBurner()
         admin()
         #time()
+        wood()
+        wood2()
+        woodCounter()
 
         py.display.update()
 

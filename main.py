@@ -1,5 +1,6 @@
 import pygame as py
 import pygame.time
+import random
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
@@ -38,7 +39,7 @@ height = 35
 pos_x = infoObject.current_w / 2
 pos_y = infoObject.current_h / 2
 
-velocity = 2.5
+velocity = 3.2
 
 health = 250
 realHealth = 100
@@ -440,7 +441,7 @@ def admin():
 run = True
 
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability
+    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, point_counter, current_spawn_ticks
     initialStormSize = 800  # Initial stormSize value
     
     while run:
@@ -545,6 +546,20 @@ def startGame():
 
             if realHealthNum > 0 and realDurabilityNum > 0:
                 xp += 1000
+
+        #burner
+        py.draw.rect(win, (0, 0, 255), (infoObject.current_w / 2 - 35, infoObject.current_h / 2 - 35, 70, 70))
+        text = myFontSmall.render("Burner", False, WHITE)
+        win.blit(text, (infoObject.current_w / 2 - 30, infoObject.current_h / 2 - 15))
+
+
+        #wood
+        # if ticks % 200 == 0:
+        #     woodX = random.randint(5, 1915)
+        #     woodY = random.randint(5, 1075)
+        #     image = pygame.image.load(r'Assets/planks.png')
+        #     image = py.transform.scale(image, (100, 100))
+        #     win.blit(image, (woodX, woodY))
 
 
         #timer_display = myFont.render("Time: " + timer_text, False, WHITE)

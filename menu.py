@@ -21,26 +21,26 @@ myFontBig = py.font.SysFont('Comic Sans MS', 50)
 WHITE = (255, 255, 255)
 BLUE = (12, 60, 179)
 
-buttonWidth = 295
-buttonHeight = 100
+buttonWidth = 300
+buttonHeight = 80
 
 
-playTop = infoObject.current_h / 4
+playTop = infoObject.current_h / 3.3
 playLeft = infoObject.current_w / 2.4
-playBottom = infoObject.current_h / 4 + buttonHeight
+playBottom = infoObject.current_h / 3.3 + buttonHeight
 playRight = infoObject.current_w / 2.4 + buttonWidth
 
-instructionsTop = infoObject.current_h / 2.7
+instructionsTop = infoObject.current_h / 2.5
 instructionsLeft = infoObject.current_w / 2.4
-instructionsBottom = infoObject.current_h / 2.7 + buttonHeight
+instructionsBottom = infoObject.current_h / 2.5 + buttonHeight
 instructionsRight = infoObject.current_w / 2.4 + buttonWidth
 
-loginTop = infoObject.current_h / 2.03
+loginTop = infoObject.current_h / 2
 loginLeft = infoObject.current_w / 2.4
-loginBottom = infoObject.current_h / 2.03 + buttonHeight
+loginBottom = infoObject.current_h / 2 + buttonHeight
 loginRight = infoObject.current_w / 2.4 + buttonWidth
 
-registerTop = infoObject.current_h / 1.62
+registerTop = infoObject.current_h / 1.66
 registerLeft = infoObject.current_w / 2.4
 registerBottom = infoObject.current_h / 1.62 + buttonHeight
 registerRight = infoObject.current_w / 2.4 + buttonWidth
@@ -91,25 +91,25 @@ def menu():
         title = myFontBig.render("hello", False, WHITE)
         win.blit(title, (infoObject.current_w / 2.2, infoObject.current_h / 12))
 
-        py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 4, buttonWidth, buttonHeight))
-        play = myFontBig.render("Play", False, WHITE)
-        win.blit(play, (infoObject.current_w / 2.13, infoObject.current_h / 3.9))
+        py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 3.3, buttonWidth, buttonHeight))
+        play = myFontMedium.render("Play", False, WHITE)
+        win.blit(play, (infoObject.current_w / 2.1, infoObject.current_h / 3.15))
 
-        py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 2.7, buttonWidth, buttonHeight))
-        instructions = myFontBig.render("How To Play", False, WHITE)
-        win.blit(instructions, (infoObject.current_w / 2.4, infoObject.current_h / 2.6))
+        py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 2.5, buttonWidth, buttonHeight))
+        instructions = myFontMedium.render("How To Play", False, WHITE)
+        win.blit(instructions, (infoObject.current_w / 2.25, infoObject.current_h / 2.43))
         
-        py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 2.03, buttonWidth, buttonHeight))
-        login = myFontBig.render("Login", False, WHITE)
-        win.blit(login, (infoObject.current_w / 2.18, infoObject.current_h / 2))
+        py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 2, buttonWidth, buttonHeight))
+        login = myFontMedium.render("Login", False, WHITE)
+        win.blit(login, (infoObject.current_w / 2.14, infoObject.current_h / 1.95))
 
-        py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 1.62, buttonWidth, buttonHeight))
-        register = myFontBig.render("Register", False, WHITE)
-        win.blit(register, (infoObject.current_w / 2.28, infoObject.current_h / 1.6))
+        py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 1.66, buttonWidth, buttonHeight))
+        register = myFontMedium.render("Register", False, WHITE)
+        win.blit(register, (infoObject.current_w / 2.2, infoObject.current_h / 1.63))
 
         py.draw.rect(win, (255, 0, 255), (infoObject.current_w / 2.4, infoObject.current_h / 1.3, buttonWidth, buttonHeight))
-        register = myFontBig.render("Leaderboard", False, WHITE)
-        win.blit(register, (infoObject.current_w / 2.4, infoObject.current_h / 1.28))
+        register = myFontMedium.render("Leaderboard", False, WHITE)
+        win.blit(register, (infoObject.current_w / 2.28, infoObject.current_h / 1.28))
 
         admin()
 

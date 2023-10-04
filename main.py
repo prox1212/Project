@@ -466,16 +466,20 @@ def woodCounter():
     count = myFontMedium.render("Wood: " + str(woodCount), False, WHITE)
     win.blit(count, (infoObject.current_w - 150, 45))
 
+last_wood_addition_time = 0
+
 
 run = True
 
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag, woodX, woodY, woodCount, wood2Flag, wood2X, wood2Y
+    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag, woodX, woodY, woodCount, wood2Flag, wood2X, wood2Y, last_wood_addition_time
     initialStormSize = 800  # Initial stormSize value
     
     while run:
         py.time.delay(10)
         ticks += 1  # Increment ticks
+        current_time = pygame.time.get_ticks()
+        time_since_last_wood_addition = current_time - last_wood_addition_time
 
         #start_time = 0
 
@@ -594,9 +598,10 @@ def startGame():
                 interact = myFontMedium.render("Press 'E' to add wood", False, WHITE)
                 win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 200))
 
-                if keys[py.K_e]:
+                if keys[py.K_e] and time_since_last_wood_addition >= 600:
                     woodCount -= 1
-                    realDurabilityNum += 100
+                    realDurabilityNum += 25
+                    last_wood_addition_time = current_time
 
         woodTop = woodX
         woodLeft = woodY

@@ -222,7 +222,7 @@ def gameOver():
 
 
 def healthBarBurner():
-    global realDurability, realDurabilityNum, realHealthNum, over
+    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
@@ -239,10 +239,15 @@ def healthBarBurner():
 
     if realDurabilityNum <= 0:
         over = True
+        woodFlag = False
+        wood2Flag = False
+        coalFlag = False
+        coalCount = 0
+        woodCount = 0
         gameOver()
 
 def healthBarPlayer():
-    global realHealth, realHealthNum, realDurabilityNum, over
+    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount
 
     decreaseHealth = realHealthNum * health / 100
     py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
@@ -256,6 +261,11 @@ def healthBarPlayer():
 
     if realHealthNum <= 0:
         over = True
+        woodFlag = False
+        wood2Flag = False
+        coalFlag = False
+        coalCount = 0
+        woodCount = 0
         gameOver()
 
 
@@ -660,7 +670,7 @@ def startGame():
             woodCount += 1
             #woodSpawnRate = 0
 
-        if woodFlag == False:
+        if woodFlag == False and realHealthNum and realDurabilityNum > 0:
                 woodX = random.randint(5, 1800)
                 woodY = random.randint(5, 1000)
                 woodFlag = True
@@ -672,7 +682,7 @@ def startGame():
             woodCount += 1
             #woodSpawnRate = 0
 
-        if wood2Flag == False:
+        if wood2Flag == False and realHealthNum and realDurabilityNum > 0:
                 wood2X = random.randint(5, 1800)
                 wood2Y = random.randint(5, 1000)
                 wood2Flag = True
@@ -683,7 +693,7 @@ def startGame():
             coalFlag = False
             coalCount += 1
 
-        if coalFlag == False:
+        if coalFlag == False and realHealthNum and realDurabilityNum > 0:
                 coalX = random.randint(5, 1800)
                 coalY = random.randint(5, 1000)
                 coalFlag = True

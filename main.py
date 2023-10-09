@@ -35,6 +35,7 @@ isAdmin = 0
 over = False
 woodCount = 0
 coalCount = 0
+colour = 255, 0, 255
 
 width = 35
 height = 35
@@ -75,7 +76,8 @@ def loginUser():
 
     def check_login():
 
-        global loggedIn, entered_username, level, xp, xpToGo, currency, isAdmin
+        global loggedIn, entered_username, level, xp, xpToGo, currency, isAdmin, red, green, blue
+
         entered_username = username_entry.get()
         entered_password = password_entry.get()
 
@@ -84,7 +86,7 @@ def loginUser():
         cursor = connection.cursor()
 
         #create the table if it doesn't exist
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0")
 
         #check if the user credentials are valid
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, entered_password))
@@ -429,6 +431,60 @@ def save():
 
 
 
+buttonWidth = 75
+buttonHeight = 75
+
+redTop = 70
+redLeft = 150
+redBottom = 70 + buttonHeight
+redRight = 150 + buttonWidth
+
+whiteTop = 70
+whiteLeft = 230
+whiteBottom = 70 + buttonHeight
+whiteRight = 230 + buttonWidth
+
+run = True
+
+
+def colourChange():
+    global run, loggedIn, colour
+    while run:
+        py.time.delay(10)
+
+        for event in py.event.get():
+            if event.type == py.QUIT:
+                run = False
+
+        mousePos = py.mouse.get_pos()
+
+        win.fill((16, 6, 48))
+
+        py.draw.rect(win, (colour), (30, 70, buttonWidth, buttonHeight))
+        customise = myFontMedium.render("Current", False, WHITE)
+        win.blit(customise, (30, 30))
+
+        py.draw.rect(win, (255, 0, 0), (150, 70, buttonWidth, buttonHeight))
+        py.draw.rect(win, (255, 255, 255), (260, 70, buttonWidth, buttonHeight))
+
+        if py.mouse.get_pressed()[0]:
+            if redLeft <= mousePos[0] <= redRight and redTop <= mousePos[1] <= redBottom:
+                print("Red button clicked")
+                colour = 255, 0, 0
+
+        if py.mouse.get_pressed()[0]:
+            if whiteLeft <= mousePos[0] <= whiteRight and whiteTop <= mousePos[1] <= whiteBottom:
+                print("White button clicked")
+                colour = 255, 255, 255
+
+        back()
+
+        py.display.update()
+
+    py.quit()
+
+
+
 def admin():
     global xp, realHealth, realHealthNum, stormSize, realDurability, realDurabilityNum
     keys = py.key.get_pressed()
@@ -575,7 +631,8 @@ def startGame():
         # Draw the storm (circle) with the adjusted size
         py.draw.circle(win, (53, 120, 2), (infoObject.current_w // 2, infoObject.current_h // 2), int(adjustedStormSize))
 
-        py.draw.rect(win, (255, 0, 255), (pos_x, pos_y, width, height))
+        #player
+        py.draw.rect(win, (colour), (pos_x, pos_y, width, height))
 
         if ticks % 7 == 0 and realDurabilityNum:
 

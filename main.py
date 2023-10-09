@@ -444,6 +444,8 @@ def admin():
             realDurabilityNum += 1
             realDurability = str(realDurabilityNum)
 
+            
+
 woodFlag = True
 wood2Flag = True
 coalFlag = True

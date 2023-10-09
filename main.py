@@ -28,11 +28,13 @@ loggedIn = 'nul'
 level = 1
 xp = 0
 xpToGo = 50
-xpGainMultiplier = 1.2
+xpToGoMultiplier = 1.2
+xpDivisor = 30
 currency = 0
 isAdmin = 0
 over = False
 woodCount = 0
+coalCount = 0
 
 width = 35
 height = 35
@@ -40,13 +42,14 @@ height = 35
 pos_x = infoObject.current_w / 2
 pos_y = infoObject.current_h / 2
 
-velocity = 3.2
+velocity = 3
 
 health = 250
 realHealth = 100
 realHealth = str(realHealth)
 realHealthNum = int(realHealth)
 
+woodSpawnRate = 0
 
 
 # storm
@@ -264,9 +267,9 @@ def levelUp():
     xpToGo = int(xpToGo)
 
     if xp >= xpToGo:
-        initialXP = int(xpToGo * xpGainMultiplier)
+        xp -= xpToGo
+        initialXP = int(xpToGo * xpToGoMultiplier)
         xpToGo = round(initialXP, -1)
-        xp = 0
         level += 1
         
         if level % 10 == 0:
@@ -443,12 +446,16 @@ def admin():
 
 woodFlag = True
 wood2Flag = True
+coalFlag = True
 
 woodX = random.randint(5, 1800)
 woodY = random.randint(5, 1000)
 
 wood2X = random.randint(5, 1800)
 wood2Y = random.randint(5, 1000)
+
+coalX = random.randint(5, 1800)
+coalY = random.randint(5, 1000)
 
 def wood():
     if woodFlag == True:
@@ -462,24 +469,41 @@ def wood2():
         image = pygame.transform.scale(image, (75, 75))
         win.blit(image, (wood2X, wood2Y))
 
+def coal():
+    if coalFlag == True:
+        image = pygame.image.load(r'Assets/coal.png')
+        image = pygame.transform.scale(image, (75, 75))
+        win.blit(image, (coalX, coalY))
+
+
 def woodCounter():
     count = myFontMedium.render("Wood: " + str(woodCount), False, WHITE)
     win.blit(count, (infoObject.current_w - 150, 45))
 
+def coalCounter():
+    count = myFontMedium.render("Coal: " + str(coalCount), False, WHITE)
+    win.blit(count, (infoObject.current_w - 150, 70))
+
 last_wood_addition_time = 0
+last_coal_addition_time = 0
 
 
 run = True
 
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag, woodX, woodY, woodCount, wood2Flag, wood2X, wood2Y, last_wood_addition_time
+    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
+    global woodX, woodY, woodCount, wood2Flag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, woodSpawnRate, coalFlag, coalCount
+    global coalX, coalY
+
     initialStormSize = 800  # Initial stormSize value
     
     while run:
         py.time.delay(10)
         ticks += 1  # Increment ticks
+        #woodSpawnRate += 1
         current_time = pygame.time.get_ticks()
         time_since_last_wood_addition = current_time - last_wood_addition_time
+        time_since_last_coal_addition = current_time - last_coal_addition_time
 
         #start_time = 0
 
@@ -548,7 +572,7 @@ def startGame():
                 realDurability = str(realDurabilityNum)
 
         # Check if the player is outside the green circle (double the radius) and 100 ticks have passed
-        if distance > adjustedStormSize and ticks % 100 == 0:
+        if distance > adjustedStormSize and ticks % 75 == 0:
 
             if realHealthNum > 0 and realDurabilityNum > 0:
                 realHealthNum -= 5
@@ -558,12 +582,12 @@ def startGame():
 
         # Check if the player is inside the circle
         if distance < adjustedStormSize:
-            if realHealthNum < 100 and ticks % 30 == 0:
+            if realHealthNum < 100 and ticks % 45 == 0:
                 if realHealthNum > 0 and realDurabilityNum > 0:
                     realHealthNum += 1
                     realHealth = str(realHealthNum)
 
-        if ticks % 35 == 0:
+        if ticks % xpDivisor == 0:
 
             if realHealthNum > 0 and realDurabilityNum > 0:
                 xp += 1
@@ -602,6 +626,17 @@ def startGame():
                     woodCount -= 1
                     realDurabilityNum += 25
                     last_wood_addition_time = current_time
+                    xp += 25
+
+            if coalCount > 0:
+                interact = myFontMedium.render("Press 'F' to add coal", False, WHITE)
+                win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 230))
+
+                if keys[py.K_f] and time_since_last_coal_addition >= 500:
+                    coalCount -= 1
+                    realDurabilityNum += 50
+                    last_coal_addition_time = current_time
+                    xp += 50
 
         woodTop = woodX
         woodLeft = woodY
@@ -613,32 +648,43 @@ def startGame():
         wood2Bottom = wood2X + 75
         wood2Right = wood2Y + 75
 
+        coalTop = coalX
+        coalLeft = coalY
+        coalBottom = coalX + 75
+        coalRight = coalY + 75
+
         if playerRight >= woodLeft and playerLeft <= woodRight and playerBottom >= woodTop and playerTop <= woodBottom:
             woodFlag = False
             woodCount += 1
+            #woodSpawnRate = 0
 
         if woodFlag == False:
-            woodX = random.randint(5, 1915)
-            woodY = random.randint(5, 1075)
-            woodFlag = True
+                woodX = random.randint(5, 1800)
+                woodY = random.randint(5, 1000)
+                woodFlag = True
+                #if woodSpawnRate == 100:
+                    #woodFlag = True
 
         if playerRight >= wood2Left and playerLeft <= wood2Right and playerBottom >= wood2Top and playerTop <= wood2Bottom:
             wood2Flag = False
             woodCount += 1
+            #woodSpawnRate = 0
 
         if wood2Flag == False:
-            wood2X = random.randint(5, 1915)
-            wood2Y = random.randint(5, 1075)
-            wood2Flag = True
+                wood2X = random.randint(5, 1800)
+                wood2Y = random.randint(5, 1000)
+                wood2Flag = True
+                #if woodSpawnRate == 100:
+                    #wood2Flag = True
 
+        if playerRight >= coalLeft and playerLeft <= coalRight and playerBottom >= coalTop and playerTop <= coalBottom:
+            coalFlag = False
+            coalCount += 1
 
-        #wood
-        # if ticks % 200 == 0:
-        #     woodX = random.randint(5, 1915)
-        #     woodY = random.randint(5, 1075)
-        #     image = pygame.image.load(r'Assets/planks.png')
-        #     image = py.transform.scale(image, (100, 100))
-        #     win.blit(image, (woodX, woodY))
+        if coalFlag == False:
+                coalX = random.randint(5, 1800)
+                coalY = random.randint(5, 1000)
+                coalFlag = True
 
 
         #timer_display = myFont.render("Time: " + timer_text, False, WHITE)
@@ -654,6 +700,8 @@ def startGame():
         wood()
         wood2()
         woodCounter()
+        coal()
+        coalCounter()
 
         py.display.update()
 

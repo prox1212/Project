@@ -88,8 +88,8 @@ def menu():
         win.fill((16, 6, 48))
 
         py.draw.rect(win, (125, 125, 125), (infoObject.current_w / 4, infoObject.current_h / 12.5, 930, buttonHeight))
-        title = myFontBig.render("hello", False, WHITE)
-        win.blit(title, (infoObject.current_w / 2.2, infoObject.current_h / 12))
+        title = myFontBig.render("Fight the Storm", False, WHITE)
+        win.blit(title, (infoObject.current_w / 2.5, infoObject.current_h / 12))
 
         py.draw.rect(win, (BLUE), (infoObject.current_w / 2.4, infoObject.current_h / 3.3, buttonWidth, buttonHeight))
         play = myFontMedium.render("Play", False, WHITE)

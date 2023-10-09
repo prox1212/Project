@@ -37,6 +37,9 @@ woodCount = 0
 coalCount = 0
 colour = 255, 0, 255
 
+red = 0
+white = 0
+
 width = 35
 height = 35
 
@@ -76,7 +79,7 @@ def loginUser():
 
     def check_login():
 
-        global loggedIn, entered_username, level, xp, xpToGo, currency, isAdmin, red, green, blue
+        global loggedIn, entered_username, level, xp, xpToGo, currency, isAdmin, red, white
 
         entered_username = username_entry.get()
         entered_password = password_entry.get()
@@ -86,7 +89,7 @@ def loginUser():
         cursor = connection.cursor()
 
         #create the table if it doesn't exist
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0")
+        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white INTEGER DEFAULT 0)")
 
         #check if the user credentials are valid
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, entered_password))
@@ -99,6 +102,8 @@ def loginUser():
             xpToGo = user[4]
             currency = user[5]
             isAdmin = user[6]
+            red = user[7]
+            white = user[8]
             messagebox.showinfo("Login Successful", "Welcome, " + entered_username + "!")
         else:
             messagebox.showerror("Login Failed", "Invalid username or password.")
@@ -430,6 +435,55 @@ def save():
                     print("Error:", ex)
 
 
+def purchase():
+    if loggedIn != 'nul':
+        try:
+            # Connect to the database
+            connection = sqlite3.connect("user_credentials.db")
+            cursor = connection.cursor()
+
+            # Get the user's current xp from the database
+            cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
+            current_xp = cursor.fetchone()[0]
+
+            cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn,))
+            current_currency = cursor.fetchone()[0]
+
+            cursor.execute("SELECT red FROM users WHERE username=?", (loggedIn,))
+            notRed = cursor.fetchone()[0]
+
+            cursor.execute("SELECT white FROM users WHERE username=?", (loggedIn,))
+            notWhite = cursor.fetchone()[0]
+
+            # Only update the database if the xp has changed
+            if current_xp != xp:
+                # Update the user's xp in the database
+                cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
+                print("XP saved successfully.")
+
+            if current_currency != currency:
+                cursor.execute("UPDATE users SET currency=? WHERE username=?", (currency, loggedIn))
+                print("currency saved successfully.")
+
+            if notRed != red:
+                cursor.execute("UPDATE users SET red=? WHERE username=?", (red, loggedIn))
+                print("purchase saved successfully.")
+
+            if notWhite != white:
+                cursor.execute("UPDATE users SET white=? WHERE username=?", (white, loggedIn))
+                print("purchase saved successfully.")
+
+            # Commit the changes and close the database connection
+            connection.commit()
+            connection.close()
+            
+        except sqlite3.Error as e:
+            print("SQLite error:", e)
+        except Exception as ex:
+            print("Error:", ex)
+
+
+
 
 buttonWidth = 75
 buttonHeight = 75
@@ -448,7 +502,7 @@ run = True
 
 
 def colourChange():
-    global run, loggedIn, colour
+    global run, loggedIn, colour, white, red, currency
     while run:
         py.time.delay(10)
 
@@ -470,12 +524,28 @@ def colourChange():
         if py.mouse.get_pressed()[0]:
             if redLeft <= mousePos[0] <= redRight and redTop <= mousePos[1] <= redBottom:
                 print("Red button clicked")
-                colour = 255, 0, 0
+                if red != 1:
+                    if currency >= 50:
+                        colour = 255, 0, 0
+                        red = 1
+                        currency -= 50
+                        purchase()
+
+                else:
+                    colour = 255, 0, 0
 
         if py.mouse.get_pressed()[0]:
             if whiteLeft <= mousePos[0] <= whiteRight and whiteTop <= mousePos[1] <= whiteBottom:
                 print("White button clicked")
-                colour = 255, 255, 255
+                if white != 1:
+                    if currency >= 100:
+                        colour = 255, 255, 255
+                        white = 1
+                        currency -= 100
+                        purchase()
+
+                else:
+                    colour = 255, 255, 255
 
         back()
 

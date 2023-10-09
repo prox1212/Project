@@ -1,6 +1,7 @@
 import pygame as py
 import pygame.time
 import random
+import time
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
@@ -72,7 +73,6 @@ realDurabilityNum = int(realDurability)
 
 
 ticks = 0  # To keep track of ticks
-
 
 
 def loginUser():
@@ -488,15 +488,20 @@ def purchase():
 buttonWidth = 75
 buttonHeight = 75
 
+purpleTop = 70
+purpleLeft = 150
+purpleBottom = 70 + buttonHeight
+purpleRight = 150 + buttonWidth
+
 redTop = 70
-redLeft = 150
+redLeft = 260
 redBottom = 70 + buttonHeight
-redRight = 150 + buttonWidth
+redRight = 260 + buttonWidth
 
 whiteTop = 70
-whiteLeft = 230
+whiteLeft = 370
 whiteBottom = 70 + buttonHeight
-whiteRight = 230 + buttonWidth
+whiteRight = 370 + buttonWidth
 
 run = True
 
@@ -514,12 +519,29 @@ def colourChange():
 
         win.fill((16, 6, 48))
 
+        currencyDisplay()
+        userDisplay()
+
         py.draw.rect(win, (colour), (30, 70, buttonWidth, buttonHeight))
         customise = myFontMedium.render("Current", False, WHITE)
         win.blit(customise, (30, 30))
 
-        py.draw.rect(win, (255, 0, 0), (150, 70, buttonWidth, buttonHeight))
-        py.draw.rect(win, (255, 255, 255), (260, 70, buttonWidth, buttonHeight))
+        if red != 1:
+            customise = myFontMedium.render("50 E", False, WHITE)
+            win.blit(customise, (265, 30))
+
+        if white != 1:
+            customise = myFontMedium.render("100 E", False, WHITE)
+            win.blit(customise, (375, 30))
+
+        py.draw.rect(win, (255, 0, 255), (150, 70, buttonWidth, buttonHeight))
+        py.draw.rect(win, (255, 0, 0), (260, 70, buttonWidth, buttonHeight))
+        py.draw.rect(win, (255, 255, 255), (370, 70, buttonWidth, buttonHeight))
+
+        if py.mouse.get_pressed()[0]:
+            if purpleLeft <= mousePos[0] <= purpleRight and purpleTop <= mousePos[1] <= purpleBottom:
+                print("purple button clicked")
+                colour = 255, 0, 255
 
         if py.mouse.get_pressed()[0]:
             if redLeft <= mousePos[0] <= redRight and redTop <= mousePos[1] <= redBottom:
@@ -529,6 +551,7 @@ def colourChange():
                         colour = 255, 0, 0
                         red = 1
                         currency -= 50
+                        time.sleep(0.5)
                         purchase()
 
                 else:
@@ -542,6 +565,7 @@ def colourChange():
                         colour = 255, 255, 255
                         white = 1
                         currency -= 100
+                        time.sleep(0.5)
                         purchase()
 
                 else:

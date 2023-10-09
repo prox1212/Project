@@ -76,7 +76,7 @@ def leaderboard():
             level = myFontMedium.render("Level", False, WHITE)
             win.blit(level, (infoObject.current_w / infoObject.current_w + 650, infoObject.current_h / infoObject.current_h + 150))
 
-            py.draw.rect(win, (64, 64, 64), (infoObject.current_w - 380, 250, 350, 600))
+            py.draw.rect(win, (64, 64, 64), (infoObject.current_w - 380, 250, 365, 600))
 
             createDatabase()
             displayLeaderboard()

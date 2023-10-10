@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import sqlite3
+import hashlib
 
 def registerUser():
 
@@ -8,6 +9,8 @@ def registerUser():
     def register_user():
         new_username = new_username_entry.get()
         new_password = new_password_entry.get()
+
+        hashed_password = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
 
         #if both fields are empty, show an error message and return without writing to the database
         if not new_username and not new_password:
@@ -29,7 +32,7 @@ def registerUser():
             messagebox.showerror("Registration Failed", "Username already exists. Please choose a different username.")
         else:
             #insert the new user's information into the database
-            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (new_username, new_password))
+            cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (new_username, hashed_password))
             connection.commit()
             connection.close()
             messagebox.showinfo("Registration Successful", "Account created successfully!")

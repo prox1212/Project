@@ -6,6 +6,7 @@ import tkinter as tk
 from tkinter import messagebox
 import sqlite3
 import threading
+import hashlib
 #from login import *
 from backButton import *
 
@@ -24,7 +25,6 @@ win = py.display.set_mode((infoObject.current_w, infoObject.current_h))
 py.display.set_caption("Fight the Storm")
 
 # player info
-
 loggedIn = 'nul'
 level = 1
 xp = 0
@@ -37,9 +37,6 @@ over = False
 woodCount = 0
 coalCount = 0
 colour = 255, 0, 255
-
-red = 0
-white = 0
 
 width = 35
 height = 35
@@ -54,10 +51,14 @@ realHealth = 100
 realHealth = str(realHealth)
 realHealthNum = int(realHealth)
 
+#player owned items
+red = 0
+white = 0
+
 woodSpawnRate = 0
 
 
-# storm
+#storm
 alpha_value = 128
 transparent_surface = py.Surface((infoObject.current_w, infoObject.current_h), py.SRCALPHA)
 transparent_surface.set_alpha(alpha_value)
@@ -72,7 +73,7 @@ realDurabilityNum = int(realDurability)
 
 
 
-ticks = 0  # To keep track of ticks
+ticks = 0  #to keep track of ticks
 
 
 def loginUser():
@@ -84,6 +85,8 @@ def loginUser():
         entered_username = username_entry.get()
         entered_password = password_entry.get()
 
+        hashed_password = hashlib.sha256(entered_password.encode('utf-8')).hexdigest()
+
         #connect to the database (or create it if it doesn't exist)
         connection = sqlite3.connect("user_credentials.db")
         cursor = connection.cursor()
@@ -92,13 +95,13 @@ def loginUser():
         cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white INTEGER DEFAULT 0)")
 
         #check if the user credentials are valid
-        cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, entered_password))
+        cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, hashed_password))
         user = cursor.fetchone()
 
         if user is not None:
             loggedIn = entered_username
-            level = user[2]  #index 2 corresponds to the level column in the database
-            xp = user[3]     #index 3 corresponds to the xp column in the database
+            level = user[2]  #index that corresponds to the column in the database
+            xp = user[3]
             xpToGo = user[4]
             currency = user[5]
             isAdmin = user[6]
@@ -146,11 +149,9 @@ def userBigDisplay():
 def gameOver():
     global loggedIn, level, xp, xpToGo, run, realHealthNum, realDurabilityNum
 
-    # Create a semi-transparent black surface
+    #create a semi-transparent black surface
     game_over_surface = py.Surface((1450, 700), py.SRCALPHA)
     game_over_surface.fill((0, 0, 0, 178))  # The fourth value (178) controls opacity (0-255)
-
-    # Draw the semi-transparent black surface on the screen
     win.blit(game_over_surface, (250, 175))
 
     title = myFontBig.render("Game Over", False, WHITE)
@@ -177,23 +178,23 @@ def gameOver():
             print("Save button clicked")
             if loggedIn != 'nul':
                 try:
-                    # Connect to the database
+                    #connect to the database
                     connection = sqlite3.connect("user_credentials.db")
                     cursor = connection.cursor()
 
-                    # Get the user's current xp from the database
+                    #get the users current xp from the database
                     cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
                     current_xp = cursor.fetchone()[0]
 
                     cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn,))
                     current_currency = cursor.fetchone()[0]
 
-                    # Only update the database if the xp has changed
+                    #only update the database if the xp has changed
                     if current_xp != xp:
-                        # Update the user's xp in the database
+                        #update the users xp in the database
                         cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
 
-                        # Commit the changes and close the database connection
+                        #commit the changes and close the database connection
                         connection.commit()
                         connection.close()
                         print("XP saved successfully.")
@@ -298,7 +299,7 @@ def levelUp():
         else:
             currency += 20
 
-        # Move database update to a separate thread
+        #move database update to a separate thread
         def update_database():
             try:
                 connection = sqlite3.connect("user_credentials.db")
@@ -313,7 +314,7 @@ def levelUp():
             except Exception as ex:
                 print("Error:", ex)
 
-        # Create a new thread for database update
+        #create a new thread for database update
         db_update_thread = threading.Thread(target=update_database)
         db_update_thread.start()
 
@@ -399,23 +400,23 @@ def save():
             print("Save button clicked")
             if loggedIn != 'nul':
                 try:
-                    # Connect to the database
+                    #connect to the database
                     connection = sqlite3.connect("user_credentials.db")
                     cursor = connection.cursor()
 
-                    # Get the user's current xp from the database
+                    #get the users current xp from the database
                     cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
                     current_xp = cursor.fetchone()[0]
 
                     cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn,))
                     current_currency = cursor.fetchone()[0]
 
-                    # Only update the database if the xp has changed
+                    #only update the database if the xp has changed
                     if current_xp != xp:
                         # Update the user's xp in the database
                         cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
 
-                        # Commit the changes and close the database connection
+                        #commit the changes and close the database connection
                         connection.commit()
                         connection.close()
                         print("XP saved successfully.")
@@ -438,11 +439,11 @@ def save():
 def purchase():
     if loggedIn != 'nul':
         try:
-            # Connect to the database
+            #connect to the database
             connection = sqlite3.connect("user_credentials.db")
             cursor = connection.cursor()
 
-            # Get the user's current xp from the database
+            #get the users current xp from the database
             cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
             current_xp = cursor.fetchone()[0]
 
@@ -455,9 +456,9 @@ def purchase():
             cursor.execute("SELECT white FROM users WHERE username=?", (loggedIn,))
             notWhite = cursor.fetchone()[0]
 
-            # Only update the database if the xp has changed
+            #only update the database if the xp has changed
             if current_xp != xp:
-                # Update the user's xp in the database
+                #update the users xp in the database
                 cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
                 print("XP saved successfully.")
 
@@ -473,7 +474,7 @@ def purchase():
                 cursor.execute("UPDATE users SET white=? WHERE username=?", (white, loggedIn))
                 print("purchase saved successfully.")
 
-            # Commit the changes and close the database connection
+            #commit the changes and close the database connection
             connection.commit()
             connection.close()
             
@@ -484,7 +485,7 @@ def purchase():
 
 
 
-
+# <ITEM SHOP>
 buttonWidth = 75
 buttonHeight = 75
 
@@ -577,6 +578,7 @@ def colourChange():
 
     py.quit()
 
+# </TIEM SHOP>
 
 
 def admin():
@@ -605,7 +607,7 @@ def admin():
             realDurability = str(realDurabilityNum)
 
             
-
+# <MATERIALS>
 woodFlag = True
 wood2Flag = True
 coalFlag = True
@@ -649,21 +651,31 @@ def coalCounter():
 last_wood_addition_time = 0
 last_coal_addition_time = 0
 
+# </MATERIALS>
 
 run = True
+previous_ticks = 0
+fps = 0
 
 def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
     global woodX, woodY, woodCount, wood2Flag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, woodSpawnRate, coalFlag, coalCount
     global coalX, coalY
+    global previous_ticks, fps
 
-    initialStormSize = 800  # Initial stormSize value
+    initialStormSize = 800  #initial stormSize value
     
     while run:
         py.time.delay(10)
-        ticks += 1  # Increment ticks
+        ticks += 1  #increment ticks
         #woodSpawnRate += 1
         current_time = pygame.time.get_ticks()
+
+        if ticks % 20 == 0:
+            fps = 1000 / (current_time - previous_ticks)
+
+        previous_ticks = current_time
+
         time_since_last_wood_addition = current_time - last_wood_addition_time
         time_since_last_coal_addition = current_time - last_coal_addition_time
 
@@ -693,14 +705,14 @@ def startGame():
 
         #current_time = py.time.get_ticks()  # Get the current time in milliseconds
 
-        # Calculate the elapsed time in milliseconds
+        #calculate the elapsed time in milliseconds
         #elapsed_time = current_time - start_time
 
-        # Calculate minutes and seconds
+        #calculate minutes and seconds
         #minutes = (elapsed_time // 1000) // 60
         #seconds = (elapsed_time // 1000) % 60
 
-        # Format the timer as "00:00"
+        #format the timer as "00:00"
         #timer_text = f"{minutes:02}:{seconds:02}"
 
         #py.time.delay(10)
@@ -711,21 +723,21 @@ def startGame():
         playerBottom = pos_x + width
         playerRight = pos_y + height
 
-        # Calculate the distance between the player and the center of the circle
+        #calculate the distance between the player and the center of the circle
         distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
 
         win.fill((16, 6, 48))
 
-        # Draw the transparent overlay
+        #draw the transparent overlay
         win.blit(transparent_surface, (0, 0))
 
-        # Calculate the adjusted stormSize based on durability
+        #calculate the adjusted stormSize based on durability
         adjustedStormSize = initialStormSize * (realDurabilityNum / 500)
 
-        # Draw the storm (circle) with the adjusted size
+        #draw the storm (circle) with the adjusted size
         py.draw.circle(win, (53, 120, 2), (infoObject.current_w // 2, infoObject.current_h // 2), int(adjustedStormSize))
 
-        #player
+        #CREATE PLAYER
         py.draw.rect(win, (colour), (pos_x, pos_y, width, height))
 
         if ticks % 7 == 0 and realDurabilityNum:
@@ -734,7 +746,7 @@ def startGame():
                 realDurabilityNum -= 1
                 realDurability = str(realDurabilityNum)
 
-        # Check if the player is outside the green circle (double the radius) and 100 ticks have passed
+        #check if the player is outside the green circle (double the radius) and 100 ticks have passed
         if distance > adjustedStormSize and ticks % 75 == 0:
 
             if realHealthNum > 0 and realDurabilityNum > 0:
@@ -743,7 +755,7 @@ def startGame():
 
         distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
 
-        # Check if the player is inside the circle
+        #check if the player is inside the circle
         if distance < adjustedStormSize:
             if realHealthNum < 100 and ticks % 45 == 0:
                 if realHealthNum > 0 and realDurabilityNum > 0:
@@ -865,6 +877,9 @@ def startGame():
         woodCounter()
         coal()
         coalCounter()
+
+        fps_text = myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
+        win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
         py.display.update()
 

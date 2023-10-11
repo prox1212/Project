@@ -36,6 +36,7 @@ isAdmin = 0
 over = False
 woodCount = 0
 coalCount = 0
+brickCount = 0
 colour = 255, 0, 255
 
 width = 35
@@ -70,6 +71,7 @@ durability = 250
 realDurability = 500
 realDurability = str(realDurability)
 realDurabilityNum = int(realDurability)
+burnerStrength = 0
 
 
 
@@ -230,7 +232,7 @@ def gameOver():
 
 
 def healthBarBurner():
-    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount
+    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
@@ -250,12 +252,14 @@ def healthBarBurner():
         woodFlag = False
         wood2Flag = False
         coalFlag = False
+        brickFlag = False
         coalCount = 0
         woodCount = 0
+        brickCount = 0
         gameOver()
 
 def healthBarPlayer():
-    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount
+    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag
 
     decreaseHealth = realHealthNum * health / 100
     py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
@@ -272,8 +276,10 @@ def healthBarPlayer():
         woodFlag = False
         wood2Flag = False
         coalFlag = False
+        brickFlag = False
         coalCount = 0
         woodCount = 0
+        brickCount = 0
         gameOver()
 
 
@@ -608,9 +614,10 @@ def admin():
 
             
 # <MATERIALS>
-woodFlag = True
-wood2Flag = True
-coalFlag = True
+woodFlag = False
+wood2Flag = False
+coalFlag = False
+brickFlag = False
 
 woodX = random.randint(5, 1800)
 woodY = random.randint(5, 1000)
@@ -621,23 +628,32 @@ wood2Y = random.randint(5, 1000)
 coalX = random.randint(5, 1800)
 coalY = random.randint(5, 1000)
 
+brickX = random.randint(5, 1800)
+brickY = random.randint(5, 1000)
+
 def wood():
-    if woodFlag == True:
+    if woodFlag == False:
         image = pygame.image.load(r'Assets/planks.png')
-        image = pygame.transform.scale(image, (75, 75))
+        image = pygame.transform.scale(image, (50, 50))
         win.blit(image, (woodX, woodY))
 
 def wood2():
-    if wood2Flag == True:
+    if wood2Flag == False:
         image = pygame.image.load(r'Assets/planks.png')
-        image = pygame.transform.scale(image, (75, 75))
+        image = pygame.transform.scale(image, (50, 50))
         win.blit(image, (wood2X, wood2Y))
 
 def coal():
-    if coalFlag == True:
+    if coalFlag == False:
         image = pygame.image.load(r'Assets/coal.png')
-        image = pygame.transform.scale(image, (75, 75))
+        image = pygame.transform.scale(image, (50, 50))
         win.blit(image, (coalX, coalY))
+
+def brick():
+    if brickFlag == False:
+        image = pygame.image.load(r'Assets/brick.png')
+        image = pygame.transform.scale(image, (50, 50))
+        win.blit(image, (brickX, brickY))
 
 
 def woodCounter():
@@ -648,8 +664,13 @@ def coalCounter():
     count = myFontMedium.render("Coal: " + str(coalCount), False, WHITE)
     win.blit(count, (infoObject.current_w - 150, 70))
 
+def brickCounter():
+    count = myFontMedium.render("Brick: " + str(brickCount), False, WHITE)
+    win.blit(count, (infoObject.current_w - 150, 95))
+
 last_wood_addition_time = 0
 last_coal_addition_time = 0
+last_brick_addition_time = 0
 
 # </MATERIALS>
 
@@ -659,8 +680,8 @@ fps = 0
 
 def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
-    global woodX, woodY, woodCount, wood2Flag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, woodSpawnRate, coalFlag, coalCount
-    global coalX, coalY
+    global woodX, woodY, woodCount, wood2Flag, brickFlag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, last_brick_addition_time, woodSpawnRate, coalFlag, coalCount, brickCount
+    global coalX, coalY, burnerStrength, brickX, brickY
     global previous_ticks, fps
 
     initialStormSize = 800  #initial stormSize value
@@ -678,6 +699,7 @@ def startGame():
 
         time_since_last_wood_addition = current_time - last_wood_addition_time
         time_since_last_coal_addition = current_time - last_coal_addition_time
+        time_since_last_brick_addition = current_time - last_coal_addition_time
 
         #start_time = 0
 
@@ -813,53 +835,77 @@ def startGame():
                     last_coal_addition_time = current_time
                     xp += 50
 
+            if brickCount > 0:
+                interact = myFontMedium.render("Press 'G' to add Strength", False, WHITE)
+                win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 260))
+
+                if keys[py.K_g] and time_since_last_brick_addition >= 500:
+                    brickCount -= 1
+                    burnerStrength += 3
+                    last_brick_addition_time = current_time
+                    xp += 35
+
         woodTop = woodX
         woodLeft = woodY
-        woodBottom = woodX + 75
-        woodRight = woodY + 75
+        woodBottom = woodX + 30
+        woodRight = woodY + 30
 
         wood2Top = wood2X
         wood2Left = wood2Y
-        wood2Bottom = wood2X + 75
-        wood2Right = wood2Y + 75
+        wood2Bottom = wood2X + 30
+        wood2Right = wood2Y + 30
 
         coalTop = coalX
         coalLeft = coalY
-        coalBottom = coalX + 75
-        coalRight = coalY + 75
+        coalBottom = coalX + 30
+        coalRight = coalY + 30
+
+        brickTop = brickX
+        brickLeft = brickY
+        brickBottom = brickX + 30
+        brickRight = brickY + 30
 
         if playerRight >= woodLeft and playerLeft <= woodRight and playerBottom >= woodTop and playerTop <= woodBottom:
-            woodFlag = False
+            woodFlag = True
             woodCount += 1
             #woodSpawnRate = 0
 
-        if woodFlag == False and realHealthNum and realDurabilityNum > 0:
+        if woodFlag == True and realHealthNum and realDurabilityNum > 0:
                 woodX = random.randint(5, 1800)
                 woodY = random.randint(5, 1000)
-                woodFlag = True
+                woodFlag = False
                 #if woodSpawnRate == 100:
                     #woodFlag = True
 
         if playerRight >= wood2Left and playerLeft <= wood2Right and playerBottom >= wood2Top and playerTop <= wood2Bottom:
-            wood2Flag = False
+            wood2Flag = True
             woodCount += 1
             #woodSpawnRate = 0
 
-        if wood2Flag == False and realHealthNum and realDurabilityNum > 0:
+        if wood2Flag == True and realHealthNum and realDurabilityNum > 0:
                 wood2X = random.randint(5, 1800)
                 wood2Y = random.randint(5, 1000)
-                wood2Flag = True
+                wood2Flag = False
                 #if woodSpawnRate == 100:
                     #wood2Flag = True
 
         if playerRight >= coalLeft and playerLeft <= coalRight and playerBottom >= coalTop and playerTop <= coalBottom:
-            coalFlag = False
+            coalFlag = True
             coalCount += 1
 
-        if coalFlag == False and realHealthNum and realDurabilityNum > 0:
+        if coalFlag == True and realHealthNum and realDurabilityNum > 0:
                 coalX = random.randint(5, 1800)
                 coalY = random.randint(5, 1000)
                 coalFlag = True
+
+        if playerRight >= brickLeft and playerLeft <= brickRight and playerBottom >= brickTop and playerTop <= brickBottom:
+            brickFlag = True
+            brickCount += 1
+
+        if brickFlag == True and realHealthNum and realDurabilityNum > 0:
+                brickX = random.randint(5, 1800)
+                brickY = random.randint(5, 1000)
+                brickFlag = False
 
 
         #timer_display = myFont.render("Time: " + timer_text, False, WHITE)
@@ -877,6 +923,8 @@ def startGame():
         woodCounter()
         coal()
         coalCounter()
+        brickCounter()
+        brick()
 
         fps_text = myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
         win.blit(fps_text, (infoObject.current_w - 100 , 10))

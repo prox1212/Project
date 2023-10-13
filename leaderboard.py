@@ -84,6 +84,8 @@ def leaderboard():
             levelXPDisplayInvert()
             back()
 
+            framesPerSecond()
+
         py.display.update()
 
     py.quit()

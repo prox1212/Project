@@ -614,10 +614,10 @@ def admin():
 
             
 # <MATERIALS>
-woodFlag = False
-wood2Flag = False
-coalFlag = False
-brickFlag = False
+woodFlag = True
+wood2Flag = True
+coalFlag = True
+brickFlag = True
 
 woodX = random.randint(5, 1800)
 woodY = random.randint(5, 1000)
@@ -631,29 +631,30 @@ coalY = random.randint(5, 1000)
 brickX = random.randint(5, 1800)
 brickY = random.randint(5, 1000)
 
+woodPNG = pygame.image.load(r'Assets/planks.png')
+imageWood = pygame.transform.scale(woodPNG, (50, 50))
+
+coalPNG = pygame.image.load(r'Assets/coal.png')
+imageCoal = pygame.transform.scale(coalPNG, (50, 50))
+
+brickPNG = pygame.image.load(r'Assets/brick.png')
+imageBrick = pygame.transform.scale(brickPNG, (50, 50))
+
 def wood():
-    if woodFlag == False:
-        image = pygame.image.load(r'Assets/planks.png')
-        image = pygame.transform.scale(image, (50, 50))
-        win.blit(image, (woodX, woodY))
+    if woodFlag == True:
+        win.blit(imageWood, (woodX, woodY))
 
 def wood2():
-    if wood2Flag == False:
-        image = pygame.image.load(r'Assets/planks.png')
-        image = pygame.transform.scale(image, (50, 50))
-        win.blit(image, (wood2X, wood2Y))
+    if wood2Flag == True:
+        win.blit(imageWood, (wood2X, wood2Y))
 
 def coal():
-    if coalFlag == False:
-        image = pygame.image.load(r'Assets/coal.png')
-        image = pygame.transform.scale(image, (50, 50))
-        win.blit(image, (coalX, coalY))
+    if coalFlag == True:
+        win.blit(imageCoal, (coalX, coalY))
 
 def brick():
-    if brickFlag == False:
-        image = pygame.image.load(r'Assets/brick.png')
-        image = pygame.transform.scale(image, (50, 50))
-        win.blit(image, (brickX, brickY))
+    if brickFlag == True:
+        win.blit(imageBrick, (brickX, brickY))
 
 
 def woodCounter():
@@ -675,8 +676,16 @@ last_brick_addition_time = 0
 # </MATERIALS>
 
 run = True
-previous_ticks = 0
-fps = 0
+#previous_ticks = 0
+#fps = 0
+
+# Create a Clock object to control frame rate
+clock = py.time.Clock()
+desiredFps = 165  # Set your desired frame rate here
+
+def framesPerSecond():
+    fps_text = myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
+    win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
 def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
@@ -692,8 +701,11 @@ def startGame():
         #woodSpawnRate += 1
         current_time = pygame.time.get_ticks()
 
-        if ticks % 20 == 0:
-            fps = 1000 / (current_time - previous_ticks)
+        #clock.tick(desiredFps)
+        fps = int(clock.get_fps())
+
+        #if ticks % 20 == 0:
+            #fps = 1000 / (current_time - previous_ticks)
 
         previous_ticks = current_time
 
@@ -866,46 +878,46 @@ def startGame():
         brickRight = brickY + 30
 
         if playerRight >= woodLeft and playerLeft <= woodRight and playerBottom >= woodTop and playerTop <= woodBottom:
-            woodFlag = True
+            woodFlag = False
             woodCount += 1
             #woodSpawnRate = 0
 
-        if woodFlag == True and realHealthNum and realDurabilityNum > 0:
+        if woodFlag == False and realHealthNum and realDurabilityNum > 0:
                 woodX = random.randint(5, 1800)
                 woodY = random.randint(5, 1000)
-                woodFlag = False
+                woodFlag = True
                 #if woodSpawnRate == 100:
                     #woodFlag = True
 
         if playerRight >= wood2Left and playerLeft <= wood2Right and playerBottom >= wood2Top and playerTop <= wood2Bottom:
-            wood2Flag = True
+            wood2Flag = False
             woodCount += 1
             #woodSpawnRate = 0
 
-        if wood2Flag == True and realHealthNum and realDurabilityNum > 0:
+        if wood2Flag == False and realHealthNum and realDurabilityNum > 0:
                 wood2X = random.randint(5, 1800)
                 wood2Y = random.randint(5, 1000)
-                wood2Flag = False
+                wood2Flag = True
                 #if woodSpawnRate == 100:
                     #wood2Flag = True
 
         if playerRight >= coalLeft and playerLeft <= coalRight and playerBottom >= coalTop and playerTop <= coalBottom:
-            coalFlag = True
+            coalFlag = False
             coalCount += 1
 
-        if coalFlag == True and realHealthNum and realDurabilityNum > 0:
+        if coalFlag == False and realHealthNum and realDurabilityNum > 0:
                 coalX = random.randint(5, 1800)
                 coalY = random.randint(5, 1000)
                 coalFlag = True
 
         if playerRight >= brickLeft and playerLeft <= brickRight and playerBottom >= brickTop and playerTop <= brickBottom:
-            brickFlag = True
+            brickFlag = False
             brickCount += 1
 
-        if brickFlag == True and realHealthNum and realDurabilityNum > 0:
+        if brickFlag == False and realHealthNum and realDurabilityNum > 0:
                 brickX = random.randint(5, 1800)
                 brickY = random.randint(5, 1000)
-                brickFlag = False
+                brickFlag = True
 
 
         #timer_display = myFont.render("Time: " + timer_text, False, WHITE)
@@ -926,10 +938,14 @@ def startGame():
         brickCounter()
         brick()
 
-        fps_text = myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
-        win.blit(fps_text, (infoObject.current_w - 100 , 10))
+        #fps_text = myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
+        #win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
+        framesPerSecond()
+        
         py.display.update()
+
+        clock.tick(desiredFps)
 
     py.quit()
 

@@ -172,9 +172,11 @@ def menu():
         exit()
         currencyDisplay()
 
-        fps_text = myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
-        win.blit(fps_text, (infoObject.current_w - 100 , 10))
+        #fps_text = myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
+        #win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
+        framesPerSecond()
+        
         py.display.update()
 
     py.quit()

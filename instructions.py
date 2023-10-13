@@ -2,7 +2,7 @@ import pygame as py
 from instructions import *
 #from login import userDisplay
 from backButton import *
-from main import userDisplay
+from main import userDisplay, framesPerSecond
 
 py.init()
 
@@ -35,6 +35,8 @@ def instruction():
         userDisplay()
 
         back()
+
+        framesPerSecond()
 
         py.display.update()
 

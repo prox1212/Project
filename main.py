@@ -683,10 +683,6 @@ run = True
 clock = py.time.Clock()
 desiredFps = 165  # Set your desired frame rate here
 
-def framesPerSecond():
-    fps_text = myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
-    win.blit(fps_text, (infoObject.current_w - 100 , 10))
-
 def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
     global woodX, woodY, woodCount, wood2Flag, brickFlag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, last_brick_addition_time, woodSpawnRate, coalFlag, coalCount, brickCount
@@ -941,8 +937,9 @@ def startGame():
         #fps_text = myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
         #win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
-        framesPerSecond()
-        
+        fps_text = myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
+        win.blit(fps_text, (infoObject.current_w - 100 , 10))
+
         py.display.update()
 
         clock.tick(desiredFps)

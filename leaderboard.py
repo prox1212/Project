@@ -53,10 +53,15 @@ def displayLeaderboard():
 # Call this function in your main loop to display the leaderboard
 run = True
 
+clock = py.time.Clock()
+desiredFps = 165
+
 def leaderboard():
     global run
     while run:
         py.time.delay(10)
+        
+        fps = int(clock.get_fps())
 
         for event in py.event.get():
             if event.type == py.QUIT:
@@ -84,7 +89,8 @@ def leaderboard():
             levelXPDisplayInvert()
             back()
 
-            framesPerSecond()
+            fps_text = myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
+            win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
         py.display.update()
 

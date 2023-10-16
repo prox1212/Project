@@ -37,7 +37,7 @@ over = False
 woodCount = 0
 coalCount = 0
 brickCount = 0
-colour = 255, 0, 255
+colour = (255, 0, 255)
 
 width = 35
 height = 35
@@ -55,6 +55,7 @@ realHealthNum = int(realHealth)
 #player owned items
 red = 0
 white = 0
+orange = 0
 
 woodSpawnRate = 0
 
@@ -71,7 +72,7 @@ durability = 250
 realDurability = 500
 realDurability = str(realDurability)
 realDurabilityNum = int(realDurability)
-burnerStrength = 0
+burnerStrength = 4
 
 
 
@@ -82,7 +83,7 @@ def loginUser():
 
     def check_login():
 
-        global loggedIn, entered_username, level, xp, xpToGo, currency, isAdmin, red, white
+        global loggedIn, entered_username, level, xp, xpToGo, currency, isAdmin, red, white, orange
 
         entered_username = username_entry.get()
         entered_password = password_entry.get()
@@ -94,7 +95,7 @@ def loginUser():
         cursor = connection.cursor()
 
         #create the table if it doesn't exist
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white INTEGER DEFAULT 0)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white INTEGER DEFAULT 0, orange INTEGER DEFAULT 0)")
 
         #check if the user credentials are valid
         cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, hashed_password))
@@ -109,6 +110,7 @@ def loginUser():
             isAdmin = user[6]
             red = user[7]
             white = user[8]
+            orange = user[9]
             messagebox.showinfo("Login Successful", "Welcome, " + entered_username + "!")
         else:
             messagebox.showerror("Login Failed", "Invalid username or password.")
@@ -462,6 +464,9 @@ def purchase():
             cursor.execute("SELECT white FROM users WHERE username=?", (loggedIn,))
             notWhite = cursor.fetchone()[0]
 
+            cursor.execute("SELECT orange FROM users WHERE username=?", (loggedIn,))
+            notOrange = cursor.fetchone()[0]
+
             #only update the database if the xp has changed
             if current_xp != xp:
                 #update the users xp in the database
@@ -478,6 +483,10 @@ def purchase():
 
             if notWhite != white:
                 cursor.execute("UPDATE users SET white=? WHERE username=?", (white, loggedIn))
+                print("purchase saved successfully.")
+
+            if notOrange != orange:
+                cursor.execute("UPDATE users SET orange=? WHERE username=?", (orange, loggedIn))
                 print("purchase saved successfully.")
 
             #commit the changes and close the database connection
@@ -510,11 +519,16 @@ whiteLeft = 370
 whiteBottom = 70 + buttonHeight
 whiteRight = 370 + buttonWidth
 
+orangeTop = 70
+orangeLeft = 480
+orangeBottom = 70 + buttonHeight
+orangeRight = 480 + buttonWidth
+
 run = True
 
 
 def colourChange():
-    global run, loggedIn, colour, white, red, currency
+    global run, loggedIn, colour, white, red, orange, currency
     while run:
         py.time.delay(10)
 
@@ -541,9 +555,14 @@ def colourChange():
             customise = myFontMedium.render("100 E", False, WHITE)
             win.blit(customise, (375, 30))
 
+        if orange != 1:
+            customise = myFontMedium.render("200 E", False, WHITE)
+            win.blit(customise, (485, 30))
+
         py.draw.rect(win, (255, 0, 255), (150, 70, buttonWidth, buttonHeight))
         py.draw.rect(win, (255, 0, 0), (260, 70, buttonWidth, buttonHeight))
         py.draw.rect(win, (255, 255, 255), (370, 70, buttonWidth, buttonHeight))
+        py.draw.rect(win, (232, 160, 16), (480, 70, buttonWidth, buttonHeight))
 
         if py.mouse.get_pressed()[0]:
             if purpleLeft <= mousePos[0] <= purpleRight and purpleTop <= mousePos[1] <= purpleBottom:
@@ -555,7 +574,7 @@ def colourChange():
                 print("Red button clicked")
                 if red != 1:
                     if currency >= 50:
-                        colour = 255, 0, 0
+                        colour = (255, 0, 0)
                         red = 1
                         currency -= 50
                         time.sleep(0.5)
@@ -569,7 +588,7 @@ def colourChange():
                 print("White button clicked")
                 if white != 1:
                     if currency >= 100:
-                        colour = 255, 255, 255
+                        colour = (255, 255, 255)
                         white = 1
                         currency -= 100
                         time.sleep(0.5)
@@ -577,6 +596,20 @@ def colourChange():
 
                 else:
                     colour = 255, 255, 255
+
+        if py.mouse.get_pressed()[0]:
+            if orangeLeft <= mousePos[0] <= orangeRight and whiteTop <= mousePos[1] <= orangeBottom:
+                print("Orange button clicked")
+                if orange != 1:
+                    if currency >= 100:
+                        colour = (232, 160, 16)
+                        orange = 1
+                        currency -= 200
+                        time.sleep(0.5)
+                        purchase()
+
+                else:
+                    colour = 232, 160, 16
 
         back()
 
@@ -707,7 +740,7 @@ def startGame():
 
         time_since_last_wood_addition = current_time - last_wood_addition_time
         time_since_last_coal_addition = current_time - last_coal_addition_time
-        time_since_last_brick_addition = current_time - last_coal_addition_time
+        time_since_last_brick_addition = current_time - last_brick_addition_time
 
         #start_time = 0
 
@@ -770,7 +803,7 @@ def startGame():
         #CREATE PLAYER
         py.draw.rect(win, (colour), (pos_x, pos_y, width, height))
 
-        if ticks % 7 == 0 and realDurabilityNum:
+        if ticks % burnerStrength == 0 and realDurabilityNum:
 
             if realDurabilityNum > 0 and realHealthNum > 0:
                 realDurabilityNum -= 1
@@ -849,7 +882,7 @@ def startGame():
 
                 if keys[py.K_g] and time_since_last_brick_addition >= 500:
                     brickCount -= 1
-                    burnerStrength += 3
+                    burnerStrength += 1
                     last_brick_addition_time = current_time
                     xp += 35
 

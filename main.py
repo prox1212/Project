@@ -72,7 +72,7 @@ durability = 250
 realDurability = 500
 realDurability = str(realDurability)
 realDurabilityNum = int(realDurability)
-burnerStrength = 4
+burnerStrength = 7
 
 
 
@@ -234,7 +234,7 @@ def gameOver():
 
 
 def difficulty():
-    global run
+    global run, burnerStrength
 
     easyTop = 300
     easyLeft = 150
@@ -276,16 +276,18 @@ def difficulty():
 
         if py.mouse.get_pressed()[0]:
             if easyLeft <= mousePos[0] <= easyRight and easyTop <= mousePos[1] <= easyBottom:
-                print("Easy button clicked")
+                burnerStrength = 9
+                print("Easy button clicked, burnerStrength = ", burnerStrength)
 
         if py.mouse.get_pressed()[0]:
             if mediumLeft <= mousePos[0] <= mediumRight and mediumTop <= mousePos[1] <= mediumBottom:
-                print("Medium button clicked")
+                burnerStrength = 6
+                print("Medium button clicked, burnerStrength = ", burnerStrength)
 
         if py.mouse.get_pressed()[0]:
             if hardLeft <= mousePos[0] <= hardRight and hardTop <= mousePos[1] <= hardBottom:
-                print("Hard button clicked")
-                
+                burnerStrength = 4
+                print("Hard button clicked, burnerStrength = ", burnerStrength)
 
         back()
 

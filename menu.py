@@ -55,6 +55,11 @@ customLeft = infoObject.current_w / 1.3
 customBottom = infoObject.current_h / 2 + buttonHeight
 customRight = infoObject.current_w / 1.3 + buttonWidth
 
+difficultyTop = infoObject.current_h / 2.45
+difficultyLeft = infoObject.current_w / 1.3
+difficultyBottom = infoObject.current_h / 2.45 + buttonHeight
+difficultyRight = infoObject.current_w / 1.3 + buttonWidth
+
 run = True
 
 
@@ -122,8 +127,12 @@ def menu():
         win.blit(register, (infoObject.current_w / 2.28, infoObject.current_h / 1.28))
         
         py.draw.rect(win, (112, 112, 112), (infoObject.current_w / 1.3, infoObject.current_h / 2, buttonWidth, buttonHeight))
-        customise = myFontMedium.render("Customise", False, WHITE)
+        customise = myFontMedium.render("Cosmetics", False, WHITE)
         win.blit(customise, (infoObject.current_w / 1.25, infoObject.current_h / 1.95))
+
+        py.draw.rect(win, (112, 112, 112), (infoObject.current_w / 1.3, infoObject.current_h / 2.45, buttonWidth, buttonHeight))
+        customise = myFontMedium.render("Difficulty", False, WHITE)
+        win.blit(customise, (infoObject.current_w / 1.25, infoObject.current_h / 2.4))
 
         admin()
 
@@ -167,6 +176,11 @@ def menu():
             if customLeft <= mousePos[0] <= customRight and customTop <= mousePos[1] <= customBottom:
                 print("Custom button clicked")
                 colourChange()
+
+        if py.mouse.get_pressed()[0]:
+            if difficultyLeft <= mousePos[0] <= difficultyRight and difficultyTop <= mousePos[1] <= difficultyBottom:
+                print("Difficulty button clicked")
+                difficulty()
 
         py.draw.rect(win, (64, 64, 64), (infoObject.current_w / infoObject.current_w + 15, 250, 400, 600))
 

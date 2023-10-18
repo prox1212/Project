@@ -233,6 +233,68 @@ def gameOver():
 
 
 
+def difficulty():
+    global run
+
+    easyTop = 300
+    easyLeft = 150
+    easyBottom = 300 + 75
+    easyRight = 150 + 300
+
+    mediumTop = 410
+    mediumLeft = 150
+    mediumBottom = 410 + 75
+    mediumRight = 150 + 300
+
+    hardTop = 520
+    hardLeft = 150
+    hardBottom = 520 + 75
+    hardRight = 150 + 300
+
+    while run:
+        py.time.delay(10)
+
+        for event in py.event.get():
+            if event.type == py.QUIT:
+                run = False
+
+        mousePos = py.mouse.get_pos()
+
+        win.fill((16, 6, 48))
+
+        py.draw.rect(win, (0, 0, 255), (150, 300, 300, 75))
+        easy = myFont.render("Easy", False, WHITE)
+        win.blit(easy, (255, 305))
+
+        py.draw.rect(win, (0, 0, 255), (150, 410, 300, 75))
+        medium = myFont.render("Medium", False, WHITE)
+        win.blit(medium, (225, 420))
+
+        py.draw.rect(win, (0, 0, 255), (150, 520, 300, 75))
+        hard = myFont.render("Hard", False, WHITE)
+        win.blit(hard, (255, 525))
+
+        if py.mouse.get_pressed()[0]:
+            if easyLeft <= mousePos[0] <= easyRight and easyTop <= mousePos[1] <= easyBottom:
+                print("Easy button clicked")
+
+        if py.mouse.get_pressed()[0]:
+            if mediumLeft <= mousePos[0] <= mediumRight and mediumTop <= mousePos[1] <= mediumBottom:
+                print("Medium button clicked")
+
+        if py.mouse.get_pressed()[0]:
+            if hardLeft <= mousePos[0] <= hardRight and hardTop <= mousePos[1] <= hardBottom:
+                print("Hard button clicked")
+                
+
+        back()
+
+        py.display.update()
+
+    py.quit()
+
+    
+
 def healthBarBurner():
     global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag
 

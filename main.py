@@ -72,7 +72,7 @@ durability = 250
 realDurability = 500
 realDurability = str(realDurability)
 realDurabilityNum = int(realDurability)
-burnerStrength = 7
+burnerStrength = 9
 
 
 
@@ -298,7 +298,7 @@ def difficulty():
     
 
 def healthBarBurner():
-    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag
+    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag, burnerStrength
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
@@ -322,10 +322,11 @@ def healthBarBurner():
         coalCount = 0
         woodCount = 0
         brickCount = 0
+        burnerStrength = 9
         gameOver()
 
 def healthBarPlayer():
-    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag
+    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag, burnerStrength
 
     decreaseHealth = realHealthNum * health / 100
     py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
@@ -346,6 +347,7 @@ def healthBarPlayer():
         coalCount = 0
         woodCount = 0
         brickCount = 0
+        burnerStrength = 9
         gameOver()
 
 

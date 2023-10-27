@@ -76,6 +76,10 @@ realDurability = str(realDurability)
 realDurabilityNum = int(realDurability)
 burnerStrength = 9
 
+easyStrength = 9
+medStrength = 6
+hardStrength = 4
+
 
 
 ticks = 0  #to keep track of ticks
@@ -334,7 +338,14 @@ def healthBarBurner():
         coalCount = 0
         woodCount = 0
         brickCount = 0
-        burnerStrength = 9
+        if setDifficulty == "Easy":
+            burnerStrength = easyStrength
+        
+        if setDifficulty == "Medium":
+            burnerStrength = medStrength
+
+        if setDifficulty == "Hard":
+            burnerStrength = hardStrength
         gameOver()
 
 def healthBarPlayer():
@@ -359,7 +370,14 @@ def healthBarPlayer():
         coalCount = 0
         woodCount = 0
         brickCount = 0
-        burnerStrength = 9
+        if setDifficulty == "Easy":
+            burnerStrength = easyStrength
+        
+        if setDifficulty == "Medium":
+            burnerStrength = medStrength
+
+        if setDifficulty == "Hard":
+            burnerStrength = hardStrength
         gameOver()
 
 

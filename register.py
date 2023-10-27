@@ -1,5 +1,6 @@
-import tkinter as tk
+import tkinter
 from tkinter import messagebox
+import customtkinter as tk
 import sqlite3
 import hashlib
 
@@ -42,28 +43,32 @@ def registerUser():
             new_password_entry.delete(0, tk.END)
 
     #create the main window
-    root = tk.Tk()
-    root.title("Login and Registration Form")
+    root = tk.CTk()
+    root.title("Registration Form")
+    root.geometry("500x350")
+
+    frame = tk.CTkFrame(master=root)
+    frame.pack(padx = 60, pady = 20, fill = "both", expand = True)
 
     #registration Section
-    register_label = tk.Label(root, text="--- Register ---")
-    register_label.pack()
+    register_label = tk.CTkLabel(master=frame, text="Register")
+    register_label.pack(padx = 10, pady = 12)
 
     #new username label and entry field
-    new_username_label = tk.Label(root, text="New Username:")
+    new_username_label = tk.CTkLabel(master=frame, text="New Username:")
     new_username_label.pack()
-    new_username_entry = tk.Entry(root)
-    new_username_entry.pack()
+    new_username_entry = tk.CTkEntry(master=frame)
+    new_username_entry.pack(padx = 10, pady = 12)
 
     #new password label and entry field
-    new_password_label = tk.Label(root, text="New Password:")
+    new_password_label = tk.CTkLabel(master=frame, text="New Password:")
     new_password_label.pack()
-    new_password_entry = tk.Entry(root, show="*")
-    new_password_entry.pack()
+    new_password_entry = tk.CTkEntry(master=frame, show="*")
+    new_password_entry.pack(padx = 10, pady = 12)
 
     #register button
-    register_button = tk.Button(root, text="Register", command=register_user)
-    register_button.pack()
+    register_button = tk.CTkButton(master=frame, text="Register", command=register_user)
+    register_button.pack(padx = 10, pady = 12)
 
     #run the main loop
     root.mainloop()

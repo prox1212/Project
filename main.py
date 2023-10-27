@@ -4,6 +4,7 @@ import random
 import time
 import tkinter as tk
 from tkinter import messagebox
+import customtkinter as tk
 import sqlite3
 import threading
 import hashlib
@@ -118,25 +119,29 @@ def loginUser():
         #close the database connection
         connection.close()
 
-    root = tk.Tk()
+    root = tk.CTk()
 
-    root.title("Login and Registration Form")
+    root.title("Login Form")
+    root.geometry("500x350")
+
+    frame = tk.CTkFrame(master=root)
+    frame.pack(padx = 60, pady = 20, fill = "both", expand = True)
 
     #username label and entry field
-    username_label = tk.Label(root, text="Username:")
+    username_label = tk.CTkLabel(master=frame, text="Username:")
     username_label.pack()
-    username_entry = tk.Entry(root)
-    username_entry.pack()
+    username_entry = tk.CTkEntry(master=frame)
+    username_entry.pack(padx = 10, pady = 12)
 
     #password label and entry field
-    password_label = tk.Label(root, text="Password:")
+    password_label = tk.CTkLabel(master=frame, text="Password:")
     password_label.pack()
-    password_entry = tk.Entry(root, show="*")
-    password_entry.pack()
+    password_entry = tk.CTkEntry(master=frame, show="*")
+    password_entry.pack(padx = 10, pady = 12)
 
     #login button
-    login_button = tk.Button(root, text="Login", command=check_login)
-    login_button.pack()
+    login_button = tk.CTkButton(master=frame, text="Login", command=check_login)
+    login_button.pack(padx = 10, pady = 12)
 
     root.mainloop()
 

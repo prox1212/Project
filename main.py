@@ -130,13 +130,13 @@ def loginUser():
     #username label and entry field
     username_label = tk.CTkLabel(master=frame, text="Username:")
     username_label.pack()
-    username_entry = tk.CTkEntry(master=frame)
+    username_entry = tk.CTkEntry(master=frame, placeholder_text="Username")
     username_entry.pack(padx = 10, pady = 12)
 
     #password label and entry field
     password_label = tk.CTkLabel(master=frame, text="Password:")
     password_label.pack()
-    password_entry = tk.CTkEntry(master=frame, show="*")
+    password_entry = tk.CTkEntry(master=frame, placeholder_text="Password", show="*")
     password_entry.pack(padx = 10, pady = 12)
 
     #login button

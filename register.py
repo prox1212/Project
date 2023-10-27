@@ -57,13 +57,13 @@ def registerUser():
     #new username label and entry field
     new_username_label = tk.CTkLabel(master=frame, text="New Username:")
     new_username_label.pack()
-    new_username_entry = tk.CTkEntry(master=frame)
+    new_username_entry = tk.CTkEntry(master=frame, placeholder_text="Username")
     new_username_entry.pack(padx = 10, pady = 12)
 
     #new password label and entry field
     new_password_label = tk.CTkLabel(master=frame, text="New Password:")
     new_password_label.pack()
-    new_password_entry = tk.CTkEntry(master=frame, show="*")
+    new_password_entry = tk.CTkEntry(master=frame, placeholder_text="Password", show="*")
     new_password_entry.pack(padx = 10, pady = 12)
 
     #register button

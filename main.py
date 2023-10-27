@@ -289,19 +289,19 @@ def difficulty():
 
         if py.mouse.get_pressed()[0]:
             if easyLeft <= mousePos[0] <= easyRight and easyTop <= mousePos[1] <= easyBottom:
-                burnerStrength = 9
+                burnerStrength = easyStrength
                 print("Easy button clicked, burnerStrength = ", burnerStrength)
                 setDifficulty = "Easy"
 
         if py.mouse.get_pressed()[0]:
             if mediumLeft <= mousePos[0] <= mediumRight and mediumTop <= mousePos[1] <= mediumBottom:
-                burnerStrength = 6
+                burnerStrength = medStrength
                 print("Medium button clicked, burnerStrength = ", burnerStrength)
                 setDifficulty = "Medium"
 
         if py.mouse.get_pressed()[0]:
             if hardLeft <= mousePos[0] <= hardRight and hardTop <= mousePos[1] <= hardBottom:
-                burnerStrength = 4
+                burnerStrength = hardStrength
                 print("Hard button clicked, burnerStrength = ", burnerStrength)
                 setDifficulty = "Hard"
 

@@ -40,6 +40,8 @@ coalCount = 0
 brickCount = 0
 colour = (255, 0, 255)
 setDifficulty = "Easy"
+powerLevel = 1
+powerLevelTickRate = 1500
 
 width = 35
 height = 35
@@ -131,6 +133,9 @@ def loginUser():
 
     frame = tk.CTkFrame(master=root)
     frame.pack(padx = 60, pady = 20, fill = "both", expand = True)
+
+    register_label = tk.CTkLabel(master=frame, text="Login")
+    register_label.pack(padx = 10, pady = 12)
 
     #username label and entry field
     username_label = tk.CTkLabel(master=frame, text="Username:")
@@ -816,7 +821,7 @@ def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
     global woodX, woodY, woodCount, wood2Flag, brickFlag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, last_brick_addition_time, woodSpawnRate, coalFlag, coalCount, brickCount
     global coalX, coalY, burnerStrength, brickX, brickY
-    global previous_ticks, fps
+    global previous_ticks, fps, powerLevel, powerLevelTickRate
 
     initialStormSize = 800  #initial stormSize value
     
@@ -940,6 +945,21 @@ def startGame():
 
             if realHealthNum > 0 and realDurabilityNum > 0:
                 xp += 1000
+
+        
+        #power level
+        if ticks % powerLevelTickRate == 0:
+            powerLevel += 1
+
+        if powerLevel % 8 == 0:
+            powerLevelTickRate -= 30
+            burnerStrength -= 3
+
+            if powerLevelTickRate < 400:
+                powerLevelTickRate = 400
+
+        power = myFont.render("Power Level: " + str(powerLevel), False, WHITE)
+        win.blit(power, (10, 130))
 
         #burner
         py.draw.rect(win, (0, 0, 255), (infoObject.current_w / 2 - 35, infoObject.current_h / 2 - 35, 70, 70))

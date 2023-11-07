@@ -312,6 +312,7 @@ def difficulty():
 
         if py.mouse.get_pressed()[0]:
             if hardLeft <= mousePos[0] <= hardRight and hardTop <= mousePos[1] <= hardBottom:
+                burnerStrength = hardStrength
                 powerLevelTickRate = hardPowerTick
                 print("Hard button clicked, burnerStrength = ", burnerStrength, "powerLevelTick = ", powerLevelTickRate)
                 setDifficulty = "Hard"
@@ -952,7 +953,7 @@ def startGame():
         if ticks % powerLevelTickRate == 0:
             powerLevel += 1
 
-        if powerLevel % 8 == 0:
+        if powerLevel % 4 == 0:
             powerLevelTickRate -= 30
             burnerStrength -= 3
 

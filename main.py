@@ -82,6 +82,10 @@ easyStrength = 9
 medStrength = 6
 hardStrength = 4
 
+easyPowerTick = 1500
+medPowerTick = 1200
+hardPowerTick = 800
+
 
 
 ticks = 0  #to keep track of ticks
@@ -295,19 +299,21 @@ def difficulty():
         if py.mouse.get_pressed()[0]:
             if easyLeft <= mousePos[0] <= easyRight and easyTop <= mousePos[1] <= easyBottom:
                 burnerStrength = easyStrength
-                print("Easy button clicked, burnerStrength = ", burnerStrength)
+                powerLevelTickRate = easyPowerTick
+                print("Easy button clicked, burnerStrength = ", burnerStrength, "powerLevelTick = ", powerLevelTickRate)
                 setDifficulty = "Easy"
 
         if py.mouse.get_pressed()[0]:
             if mediumLeft <= mousePos[0] <= mediumRight and mediumTop <= mousePos[1] <= mediumBottom:
                 burnerStrength = medStrength
-                print("Medium button clicked, burnerStrength = ", burnerStrength)
+                powerLevelTickRate = medPowerTick
+                print("Medium button clicked, burnerStrength = ", burnerStrength, "powerLevelTick = ", powerLevelTickRate)
                 setDifficulty = "Medium"
 
         if py.mouse.get_pressed()[0]:
             if hardLeft <= mousePos[0] <= hardRight and hardTop <= mousePos[1] <= hardBottom:
-                burnerStrength = hardStrength
-                print("Hard button clicked, burnerStrength = ", burnerStrength)
+                powerLevelTickRate = hardPowerTick
+                print("Hard button clicked, burnerStrength = ", burnerStrength, "powerLevelTick = ", powerLevelTickRate)
                 setDifficulty = "Hard"
 
         back()
@@ -319,7 +325,7 @@ def difficulty():
     
 
 def healthBarBurner():
-    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag, burnerStrength
+    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag, burnerStrength, powerLevel, powerLevelTickRate
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
@@ -343,18 +349,22 @@ def healthBarBurner():
         coalCount = 0
         woodCount = 0
         brickCount = 0
+        powerLevel = 1
         if setDifficulty == "Easy":
             burnerStrength = easyStrength
+            powerLevelTickRate = easyPowerTick
         
         if setDifficulty == "Medium":
             burnerStrength = medStrength
+            powerLevelTickRate = medPowerTick
 
         if setDifficulty == "Hard":
             burnerStrength = hardStrength
+            powerLevelTickRate = medPowerTick
         gameOver()
 
 def healthBarPlayer():
-    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag, burnerStrength
+    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag, burnerStrength, powerLevel, powerLevelTickRate
 
     decreaseHealth = realHealthNum * health / 100
     py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
@@ -375,14 +385,18 @@ def healthBarPlayer():
         coalCount = 0
         woodCount = 0
         brickCount = 0
+        powerLevel = 1
         if setDifficulty == "Easy":
             burnerStrength = easyStrength
+            powerLevelTickRate = easyPowerTick
         
         if setDifficulty == "Medium":
             burnerStrength = medStrength
+            powerLevelTickRate = medPowerTick
 
         if setDifficulty == "Hard":
             burnerStrength = hardStrength
+            powerLevelTickRate = medPowerTick
         gameOver()
 
 
@@ -947,6 +961,8 @@ def startGame():
 
         power = myFont.render("Power Level: " + str(powerLevel), False, WHITE)
         win.blit(power, (10, 130))
+        strength = myFontMedium.render("Burner Strength: " + str(burnerStrength), False, WHITE)
+        win.blit(strength, (10, 170))
 
         #burner
         py.draw.rect(win, (0, 0, 255), (infoObject.current_w / 2 - 35, infoObject.current_h / 2 - 35, 70, 70))

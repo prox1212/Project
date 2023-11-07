@@ -926,25 +926,12 @@ def startGame():
                     realHealthNum += 1
                     realHealth = str(realHealthNum)
 
-        if ticks % xpDivisor == 0:
+        xp_conditions = [(xpDivisor, 1), (6000, 150), (18000, 450), (30000, 1000)]
 
-            if realHealthNum > 0 and realDurabilityNum > 0:
-                xp += 1
+        for condition, xp_increment in xp_conditions:
+            if ticks % condition == 0 and realHealthNum > 0 and realDurabilityNum > 0:
+                xp += xp_increment
 
-        if ticks % 6000 == 0:
-
-            if realHealthNum > 0 and realDurabilityNum > 0:
-                xp += 150
-
-        if ticks % 18000 == 0:
-
-            if realHealthNum > 0 and realDurabilityNum > 0:
-                xp += 450
-
-        if ticks % 30000 == 0:
-
-            if realHealthNum > 0 and realDurabilityNum > 0:
-                xp += 1000
 
         
         #power level

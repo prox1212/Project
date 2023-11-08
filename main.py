@@ -1,3 +1,4 @@
+from lib2to3.pgen2.token import LEFTSHIFT
 import pygame as py
 import pygame.time
 import random
@@ -10,39 +11,20 @@ import threading
 import hashlib
 #from login import *
 from backButton import *
+from vars import *
 
 py.init()
 
 py.font.init()
-myFont = py.font.SysFont('Comic Sans MS', 35)
-myFontMedium = py.font.SysFont('Comic Sans MS', 24)
-myFontSmall = py.font.SysFont('Comic Sans MS', 16)
-myFontBig = py.font.SysFont('Comic Sans MS', 50)
-
-# fullscreen
-infoObject = py.display.Info()
-win = py.display.set_mode((infoObject.current_w, infoObject.current_h))
 
 py.display.set_caption("Fight the Storm")
 
-# player info
-loggedIn = 'nul'
-level = 1
-xp = 0
-xpToGo = 50
-xpToGoMultiplier = 1.2
-xpDivisor = 30
-currency = 0
-isAdmin = 0
-over = False
-woodCount = 0
-coalCount = 0
-brickCount = 0
-colour = (255, 0, 255)
-setDifficulty = "Easy"
-powerLevel = 1
-powerLevelTickRate = 1500
+ticks = 0  #to keep track of ticks
 
+clock = py.time.Clock()
+desiredFps = 165
+
+# Player data
 width = 35
 height = 35
 
@@ -56,15 +38,9 @@ realHealth = 100
 realHealth = str(realHealth)
 realHealthNum = int(realHealth)
 
-#player owned items
-red = 0
-white = 0
-orange = 0
+hit_multiple_4 = False
 
-woodSpawnRate = 0
-
-
-#storm
+# Storm
 alpha_value = 128
 transparent_surface = py.Surface((infoObject.current_w, infoObject.current_h), py.SRCALPHA)
 transparent_surface.set_alpha(alpha_value)
@@ -76,692 +52,7 @@ durability = 250
 realDurability = 500
 realDurability = str(realDurability)
 realDurabilityNum = int(realDurability)
-burnerStrength = 9
 
-easyStrength = 9
-medStrength = 6
-hardStrength = 4
-
-easyPowerTick = 1500
-medPowerTick = 1200
-hardPowerTick = 800
-
-
-
-ticks = 0  #to keep track of ticks
-
-
-def loginUser():
-
-    def check_login():
-
-        global loggedIn, entered_username, level, xp, xpToGo, currency, isAdmin, red, white, orange
-
-        entered_username = username_entry.get()
-        entered_password = password_entry.get()
-
-        hashed_password = hashlib.sha256(entered_password.encode('utf-8')).hexdigest()
-
-        #connect to the database (or create it if it doesn't exist)
-        connection = sqlite3.connect("user_credentials.db")
-        cursor = connection.cursor()
-
-        #create the table if it doesn't exist
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white INTEGER DEFAULT 0, orange INTEGER DEFAULT 0)")
-
-        #check if the user credentials are valid
-        cursor.execute("SELECT * FROM users WHERE username=? AND password=?", (entered_username, hashed_password))
-        user = cursor.fetchone()
-
-        if user is not None:
-            loggedIn = entered_username
-            level = user[2]  #index that corresponds to the column in the database
-            xp = user[3]
-            xpToGo = user[4]
-            currency = user[5]
-            isAdmin = user[6]
-            red = user[7]
-            white = user[8]
-            orange = user[9]
-            messagebox.showinfo("Login Successful", "Welcome, " + entered_username + "!")
-        else:
-            messagebox.showerror("Login Failed", "Invalid username or password.")
-
-        #close the database connection
-        connection.close()
-
-    root = tk.CTk()
-
-    root.title("Login Form")
-    root.geometry("500x350")
-
-    frame = tk.CTkFrame(master=root)
-    frame.pack(padx = 60, pady = 20, fill = "both", expand = True)
-
-    register_label = tk.CTkLabel(master=frame, text="Login")
-    register_label.pack(padx = 10, pady = 12)
-
-    #username label and entry field
-    username_label = tk.CTkLabel(master=frame, text="Username:")
-    username_label.pack()
-    username_entry = tk.CTkEntry(master=frame, placeholder_text="Username")
-    username_entry.pack(padx = 10, pady = 12)
-
-    #password label and entry field
-    password_label = tk.CTkLabel(master=frame, text="Password:")
-    password_label.pack()
-    password_entry = tk.CTkEntry(master=frame, placeholder_text="Password", show="*")
-    password_entry.pack(padx = 10, pady = 12)
-
-    #login button
-    login_button = tk.CTkButton(master=frame, text="Login", command=check_login)
-    login_button.pack(padx = 10, pady = 12)
-
-    root.mainloop()
-
-def userDisplay():
-    usern = myFont.render("Logged in as: " + loggedIn, False, WHITE)
-    win.blit(usern, (infoObject.current_w - 350, 35))
-
-def userBigDisplay():
-    usern = myFontBig.render(" " + loggedIn, False, WHITE)
-    win.blit(usern, (infoObject.current_w - 300, 110))
-
-
-
-def gameOver():
-    global loggedIn, level, xp, xpToGo, run, realHealthNum, realDurabilityNum
-
-    #create a semi-transparent black surface
-    game_over_surface = py.Surface((1450, 700), py.SRCALPHA)
-    game_over_surface.fill((0, 0, 0, 178))  # The fourth value (178) controls opacity (0-255)
-    win.blit(game_over_surface, (250, 175))
-
-    title = myFontBig.render("Game Over", False, WHITE)
-    win.blit(title, (850, 180))
-
-    mousePos = py.mouse.get_pos()
-
-    saveTop = 765
-    saveLeft = 300
-    saveBottom = saveTop + 70
-    saveRight = saveLeft + 200
-
-    menuTop = 765
-    menuLeft = 1445
-    menuBottom = menuTop + 70
-    menuRight = menuLeft + 200
-
-    py.draw.rect(win, (255, 0, 0), (saveLeft, saveTop, 200, 70))
-    save = myFontBig.render("Save", False, WHITE)
-    win.blit(save, (saveLeft + 45, saveTop - 5))
-
-    if py.mouse.get_pressed()[0]:
-        if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
-            print("Save button clicked")
-            if loggedIn != 'nul':
-                try:
-                    #connect to the database
-                    connection = sqlite3.connect("user_credentials.db")
-                    cursor = connection.cursor()
-
-                    #get the users current xp from the database
-                    cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
-                    current_xp = cursor.fetchone()[0]
-
-                    cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn,))
-                    current_currency = cursor.fetchone()[0]
-
-                    #only update the database if the xp has changed
-                    if current_xp != xp:
-                        #update the users xp in the database
-                        cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
-
-                        #commit the changes and close the database connection
-                        connection.commit()
-                        connection.close()
-                        print("XP saved successfully.")
-
-                    if current_currency != currency:
-                        cursor.execute("UPDATE users SET currency=? WHERE username=?", (currency, loggedIn))
-
-                        connection.commit()
-                        connection.close()
-                        print("currency saved successfully.")
-
-                    else:
-                        print("XP is unchanged. No update needed.")
-                except sqlite3.Error as e:
-                    print("SQLite error:", e)
-                except Exception as ex:
-                    print("Error:", ex)
-
-    
-    py.draw.rect(win, (255, 0, 0), (menuLeft, menuTop, 200, 70))
-    menu = myFontBig.render("Menu", False, WHITE)
-    win.blit(menu, (menuLeft + 45, menuTop - 5))
-
-    if py.mouse.get_pressed()[0]:
-        if menuLeft <= mousePos[0] <= menuRight and menuTop <= mousePos[1] <= menuBottom:
-            print("Menu button clicked")
-            realDurabilityNum = 500
-            realHealthNum = 100
-            import menu
-            menu.menu()
-            run = False
-
-
-
-def difficulty():
-    global run, burnerStrength, setDifficulty
-
-    easyTop = 300
-    easyLeft = 150
-    easyBottom = 300 + 75
-    easyRight = 150 + 300
-
-    mediumTop = 410
-    mediumLeft = 150
-    mediumBottom = 410 + 75
-    mediumRight = 150 + 300
-
-    hardTop = 520
-    hardLeft = 150
-    hardBottom = 520 + 75
-    hardRight = 150 + 300
-
-    while run:
-        py.time.delay(10)
-
-        for event in py.event.get():
-            if event.type == py.QUIT:
-                run = False
-
-        mousePos = py.mouse.get_pos()
-
-        win.fill((16, 6, 48))
-
-        py.draw.rect(win, (0, 0, 255), (150, 300, 300, 75))
-        easy = myFont.render("Easy", False, WHITE)
-        win.blit(easy, (255, 305))
-
-        py.draw.rect(win, (0, 0, 255), (150, 410, 300, 75))
-        medium = myFont.render("Medium", False, WHITE)
-        win.blit(medium, (225, 420))
-
-        py.draw.rect(win, (0, 0, 255), (150, 520, 300, 75))
-        hard = myFont.render("Hard", False, WHITE)
-        win.blit(hard, (255, 525))
-
-        displayDifficulty = myFont.render("Difficulty: " + setDifficulty, False, WHITE)
-        win.blit(displayDifficulty, (25, 30))
-
-        if py.mouse.get_pressed()[0]:
-            if easyLeft <= mousePos[0] <= easyRight and easyTop <= mousePos[1] <= easyBottom:
-                burnerStrength = easyStrength
-                powerLevelTickRate = easyPowerTick
-                print("Easy button clicked, burnerStrength = ", burnerStrength, "powerLevelTick = ", powerLevelTickRate)
-                setDifficulty = "Easy"
-
-        if py.mouse.get_pressed()[0]:
-            if mediumLeft <= mousePos[0] <= mediumRight and mediumTop <= mousePos[1] <= mediumBottom:
-                burnerStrength = medStrength
-                powerLevelTickRate = medPowerTick
-                print("Medium button clicked, burnerStrength = ", burnerStrength, "powerLevelTick = ", powerLevelTickRate)
-                setDifficulty = "Medium"
-
-        if py.mouse.get_pressed()[0]:
-            if hardLeft <= mousePos[0] <= hardRight and hardTop <= mousePos[1] <= hardBottom:
-                burnerStrength = hardStrength
-                powerLevelTickRate = hardPowerTick
-                print("Hard button clicked, burnerStrength = ", burnerStrength, "powerLevelTick = ", powerLevelTickRate)
-                setDifficulty = "Hard"
-
-        back()
-
-        py.display.update()
-
-    py.quit()
-
-    
-
-def healthBarBurner():
-    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag, burnerStrength, powerLevel, powerLevelTickRate
-
-    decreaseDurability = realDurabilityNum * durability / 500
-    py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
-    py.draw.rect(win, (255, 140, 0), (20, 100, decreaseDurability, 25))
-    durabilityDisplay = myFontSmall.render(" | 500", False, WHITE)
-    realDurabilityDisplay = myFontSmall.render(str(realDurabilityNum), False, WHITE)
-    burner = myFontMedium.render("Burner", False, WHITE)
-    win.blit(durabilityDisplay, (45, 100))
-    win.blit(realDurabilityDisplay, (21, 100))
-    win.blit(burner, (21, 70))
-
-    if realDurabilityNum > 500:
-        realDurabilityNum = 500
-
-    if realDurabilityNum <= 0:
-        over = True
-        woodFlag = False
-        wood2Flag = False
-        coalFlag = False
-        brickFlag = False
-        coalCount = 0
-        woodCount = 0
-        brickCount = 0
-        powerLevel = 1
-        if setDifficulty == "Easy":
-            burnerStrength = easyStrength
-            powerLevelTickRate = easyPowerTick
-        
-        if setDifficulty == "Medium":
-            burnerStrength = medStrength
-            powerLevelTickRate = medPowerTick
-
-        if setDifficulty == "Hard":
-            burnerStrength = hardStrength
-            powerLevelTickRate = medPowerTick
-        gameOver()
-
-def healthBarPlayer():
-    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, coalCount, woodCount, brickCount, brickFlag, burnerStrength, powerLevel, powerLevelTickRate
-
-    decreaseHealth = realHealthNum * health / 100
-    py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
-    py.draw.rect(win, (0, 255, 0), (20, 40, decreaseHealth, 25))
-    healthDisplay = myFontSmall.render(" | 100", False, WHITE)
-    realHealthDisplay = myFontSmall.render(str(realHealthNum), False, WHITE)
-    player = myFontMedium.render("" + loggedIn, False, WHITE)
-    win.blit(healthDisplay, (45, 43))
-    win.blit(realHealthDisplay, (21, 43))
-    win.blit(player, (21, 10))
-
-    if realHealthNum <= 0:
-        over = True
-        woodFlag = False
-        wood2Flag = False
-        coalFlag = False
-        brickFlag = False
-        coalCount = 0
-        woodCount = 0
-        brickCount = 0
-        powerLevel = 1
-        if setDifficulty == "Easy":
-            burnerStrength = easyStrength
-            powerLevelTickRate = easyPowerTick
-        
-        if setDifficulty == "Medium":
-            burnerStrength = medStrength
-            powerLevelTickRate = medPowerTick
-
-        if setDifficulty == "Hard":
-            burnerStrength = hardStrength
-            powerLevelTickRate = medPowerTick
-        gameOver()
-
-
-
-def levelUp():
-    global xp, xpToGo, level, loggedIn, currency
-
-    xp = int(xp)
-    xpToGo = int(xpToGo)
-
-    if xp >= xpToGo:
-        xp -= xpToGo
-        initialXP = int(xpToGo * xpToGoMultiplier)
-        xpToGo = round(initialXP, -1)
-        level += 1
-        
-        if level % 10 == 0:
-            currency += 100
-
-        elif level % 5 == 0:
-            currency += 50
-
-        else:
-            currency += 20
-
-        #move database update to a separate thread
-        def update_database():
-            try:
-                connection = sqlite3.connect("user_credentials.db")
-                cursor = connection.cursor()
-
-                cursor.execute("UPDATE users SET level=?, xp=?, xpToGo=?, currency=? WHERE username=?", (level, xp, xpToGo, currency, loggedIn))
-
-                connection.commit()
-                connection.close()
-            except sqlite3.Error as e:
-                print("SQLite error:", e)
-            except Exception as ex:
-                print("Error:", ex)
-
-        #create a new thread for database update
-        db_update_thread = threading.Thread(target=update_database)
-        db_update_thread.start()
-
-
-
-def levelXPDisplay():
-    global progressionW
-    userLevel = myFont.render("Level: " + str(level), False, WHITE)
-    win.blit(userLevel, (infoObject.current_w / infoObject.current_w + 35, 300))
-
-    userXp = myFont.render("Experience: " + str(xp), False, WHITE)
-    win.blit(userXp, (infoObject.current_w / infoObject.current_w + 35, 400))
-
-    xpLimit = myFont.render("XP To Level Up: " + str(xpToGo), False, WHITE)
-    win.blit(xpLimit, (infoObject.current_w / infoObject.current_w + 35, 485))
-
-    progress = myFontMedium.render("Progress:", False, WHITE)
-    win.blit(progress, (infoObject.current_w / infoObject.current_w + 35, 565))
-
-    progressionW = int(xp) * 250 / int(xpToGo)
-    py.draw.rect(win, (125, 125, 125), (infoObject.current_w / infoObject.current_w + 35, 600, 250, 15))
-    py.draw.rect(win, (0, 255, 0), (infoObject.current_w / infoObject.current_w + 35, 600, progressionW, 15))
-
-
-def currencyDisplay():
-    usern = myFont.render("Eddies: " + str(currency), False, WHITE)
-    win.blit(usern, (infoObject.current_w - 350, 100))
-
-
-
-progressionW = int(xp) * 250 / int(xpToGo)
-
-def levelXPDisplayInvert():
-    userLevel = myFont.render("Level: " + str(level), False, WHITE)
-    win.blit(userLevel, (infoObject.current_w - 350, 300))
-
-    userXp = myFont.render("Experience: " + str(xp), False, WHITE)
-    win.blit(userXp, (infoObject.current_w - 350, 400))
-
-    xpLimit = myFont.render("XP To Level Up: " + str(xpToGo), False, WHITE)
-    win.blit(xpLimit, (infoObject.current_w - 350, 485))
-
-    progress = myFontMedium.render("Progress:", False, WHITE)
-    win.blit(progress, (infoObject.current_w - 350, 565))
-
-    py.draw.rect(win, (125, 125, 125), (infoObject.current_w - 350, 600, 250, 15))
-    py.draw.rect(win, (0, 255, 0), (infoObject.current_w - 350, 600, progressionW, 15))
-
-def ingameXpBar():
-    global progressionW
-    progressionW = int(xp) * 250 / int(xpToGo)  # Update progressionW based on current XP and XPToGo
-
-    py.draw.rect(win, (125, 125, 125), (infoObject.current_w / 2.3, infoObject.current_h - 20, 250, 15))
-    py.draw.rect(win, (0, 255, 0), (infoObject.current_w / 2.3, infoObject.current_h - 20, progressionW, 15))
-
-    userLevel = myFontSmall.render("Level: " + str(level), False, WHITE)
-    win.blit(userLevel, (infoObject.current_w / 2.5, infoObject.current_h - 45))
-
-    userXp = myFontSmall.render("Experience: " + str(xp), False, WHITE)
-    win.blit(userXp, (infoObject.current_w / 2.1, infoObject.current_h - 45))
-
-    xpLimit = myFontSmall.render("/ " + str(xpToGo), False, WHITE)
-    win.blit(xpLimit, (infoObject.current_w / 1.75, infoObject.current_h - 45))
-
-
-
-def save():
-    global loggedIn, level, xp, xpToGo
-
-    mousePos = py.mouse.get_pos()
-
-    saveTop = 135
-    saveLeft = 35
-    saveBottom = saveTop + 70
-    saveRight = saveLeft + 200
-
-    py.draw.rect(win, (255, 0, 0), (saveLeft, saveTop, 200, 70))
-    save = myFontBig.render("Save", False, WHITE)
-    win.blit(save, (saveLeft + 45, saveTop - 5))
-
-    if py.mouse.get_pressed()[0]:
-        if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
-            print("Save button clicked")
-            if loggedIn != 'nul':
-                try:
-                    #connect to the database
-                    connection = sqlite3.connect("user_credentials.db")
-                    cursor = connection.cursor()
-
-                    #get the users current xp from the database
-                    cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
-                    current_xp = cursor.fetchone()[0]
-
-                    cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn,))
-                    current_currency = cursor.fetchone()[0]
-
-                    #only update the database if the xp has changed
-                    if current_xp != xp:
-                        # Update the user's xp in the database
-                        cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
-
-                        #commit the changes and close the database connection
-                        connection.commit()
-                        connection.close()
-                        print("XP saved successfully.")
-
-                    if current_currency != currency:
-                        cursor.execute("UPDATE users SET currency=? WHERE username=?", (currency, loggedIn))
-
-                        connection.commit()
-                        connection.close()
-                        print("currency saved successfully.")
-
-                    else:
-                        print("XP is unchanged. No update needed.")
-                except sqlite3.Error as e:
-                    print("SQLite error:", e)
-                except Exception as ex:
-                    print("Error:", ex)
-
-
-def purchase():
-    if loggedIn != 'nul':
-        try:
-            #connect to the database
-            connection = sqlite3.connect("user_credentials.db")
-            cursor = connection.cursor()
-
-            #get the users current xp from the database
-            cursor.execute("SELECT xp FROM users WHERE username=?", (loggedIn,))
-            current_xp = cursor.fetchone()[0]
-
-            cursor.execute("SELECT currency FROM users WHERE username=?", (loggedIn,))
-            current_currency = cursor.fetchone()[0]
-
-            cursor.execute("SELECT red FROM users WHERE username=?", (loggedIn,))
-            notRed = cursor.fetchone()[0]
-
-            cursor.execute("SELECT white FROM users WHERE username=?", (loggedIn,))
-            notWhite = cursor.fetchone()[0]
-
-            cursor.execute("SELECT orange FROM users WHERE username=?", (loggedIn,))
-            notOrange = cursor.fetchone()[0]
-
-            #only update the database if the xp has changed
-            if current_xp != xp:
-                #update the users xp in the database
-                cursor.execute("UPDATE users SET xp=? WHERE username=?", (xp, loggedIn))
-                print("XP saved successfully.")
-
-            if current_currency != currency:
-                cursor.execute("UPDATE users SET currency=? WHERE username=?", (currency, loggedIn))
-                print("currency saved successfully.")
-
-            if notRed != red:
-                cursor.execute("UPDATE users SET red=? WHERE username=?", (red, loggedIn))
-                print("purchase saved successfully.")
-
-            if notWhite != white:
-                cursor.execute("UPDATE users SET white=? WHERE username=?", (white, loggedIn))
-                print("purchase saved successfully.")
-
-            if notOrange != orange:
-                cursor.execute("UPDATE users SET orange=? WHERE username=?", (orange, loggedIn))
-                print("purchase saved successfully.")
-
-            #commit the changes and close the database connection
-            connection.commit()
-            connection.close()
-            
-        except sqlite3.Error as e:
-            print("SQLite error:", e)
-        except Exception as ex:
-            print("Error:", ex)
-
-
-
-# <ITEM SHOP>
-buttonWidth = 75
-buttonHeight = 75
-
-purpleTop = 70
-purpleLeft = 150
-purpleBottom = 70 + buttonHeight
-purpleRight = 150 + buttonWidth
-
-redTop = 70
-redLeft = 260
-redBottom = 70 + buttonHeight
-redRight = 260 + buttonWidth
-
-whiteTop = 70
-whiteLeft = 370
-whiteBottom = 70 + buttonHeight
-whiteRight = 370 + buttonWidth
-
-orangeTop = 70
-orangeLeft = 480
-orangeBottom = 70 + buttonHeight
-orangeRight = 480 + buttonWidth
-
-run = True
-
-
-def colourChange():
-    global run, loggedIn, colour, white, red, orange, currency
-    while run:
-        py.time.delay(10)
-
-        for event in py.event.get():
-            if event.type == py.QUIT:
-                run = False
-
-        mousePos = py.mouse.get_pos()
-
-        win.fill((16, 6, 48))
-
-        currencyDisplay()
-        userDisplay()
-
-        py.draw.rect(win, (colour), (30, 70, buttonWidth, buttonHeight))
-        customise = myFontMedium.render("Current", False, WHITE)
-        win.blit(customise, (30, 30))
-
-        if red != 1:
-            customise = myFontMedium.render("50 E", False, WHITE)
-            win.blit(customise, (265, 30))
-
-        if white != 1:
-            customise = myFontMedium.render("100 E", False, WHITE)
-            win.blit(customise, (375, 30))
-
-        if orange != 1:
-            customise = myFontMedium.render("200 E", False, WHITE)
-            win.blit(customise, (485, 30))
-
-        py.draw.rect(win, (255, 0, 255), (150, 70, buttonWidth, buttonHeight))
-        py.draw.rect(win, (255, 0, 0), (260, 70, buttonWidth, buttonHeight))
-        py.draw.rect(win, (255, 255, 255), (370, 70, buttonWidth, buttonHeight))
-        py.draw.rect(win, (232, 160, 16), (480, 70, buttonWidth, buttonHeight))
-
-        if py.mouse.get_pressed()[0]:
-            if purpleLeft <= mousePos[0] <= purpleRight and purpleTop <= mousePos[1] <= purpleBottom:
-                print("purple button clicked")
-                colour = 255, 0, 255
-
-        if py.mouse.get_pressed()[0]:
-            if redLeft <= mousePos[0] <= redRight and redTop <= mousePos[1] <= redBottom:
-                print("Red button clicked")
-                if red != 1:
-                    if currency >= 50:
-                        colour = (255, 0, 0)
-                        red = 1
-                        currency -= 50
-                        time.sleep(0.5)
-                        purchase()
-
-                else:
-                    colour = 255, 0, 0
-
-        if py.mouse.get_pressed()[0]:
-            if whiteLeft <= mousePos[0] <= whiteRight and whiteTop <= mousePos[1] <= whiteBottom:
-                print("White button clicked")
-                if white != 1:
-                    if currency >= 100:
-                        colour = (255, 255, 255)
-                        white = 1
-                        currency -= 100
-                        time.sleep(0.5)
-                        purchase()
-
-                else:
-                    colour = 255, 255, 255
-
-        if py.mouse.get_pressed()[0]:
-            if orangeLeft <= mousePos[0] <= orangeRight and whiteTop <= mousePos[1] <= orangeBottom:
-                print("Orange button clicked")
-                if orange != 1:
-                    if currency >= 100:
-                        colour = (232, 160, 16)
-                        orange = 1
-                        currency -= 200
-                        time.sleep(0.5)
-                        purchase()
-
-                else:
-                    colour = 232, 160, 16
-
-        back()
-
-        py.display.update()
-
-    py.quit()
-
-# </TIEM SHOP>
-
-
-def admin():
-    global xp, realHealth, realHealthNum, stormSize, realDurability, realDurabilityNum
-    keys = py.key.get_pressed()
-
-    if isAdmin == 1:
-
-        if keys[py.K_r]:
-            xp += 1
-
-        if keys[py.K_t]:
-            realHealthNum = int(realHealth)
-            realHealthNum -= 1
-            realHealth = str(realHealthNum)
-
-        if keys[py.K_o]:
-            stormSize -= 1
-
-        if keys[py.K_i]:
-            stormSize += 1
-
-        if keys[py.K_p]:
-            realDurabilityNum = int(realDurability)
-            realDurabilityNum += 1
-            realDurability = str(realDurabilityNum)
-
-            
 # <MATERIALS>
 woodFlag = True
 wood2Flag = True
@@ -780,43 +71,14 @@ coalY = random.randint(5, 1000)
 brickX = random.randint(5, 1800)
 brickY = random.randint(5, 1000)
 
-woodPNG = pygame.image.load(r'Assets/planks.png')
-imageWood = pygame.transform.scale(woodPNG, (50, 50))
+woodPNG = py.image.load(r'Assets/planks.png')
+imageWood = py.transform.scale(woodPNG, (50, 50))
 
-coalPNG = pygame.image.load(r'Assets/coal.png')
-imageCoal = pygame.transform.scale(coalPNG, (50, 50))
+coalPNG = py.image.load(r'Assets/coal.png')
+imageCoal = py.transform.scale(coalPNG, (50, 50))
 
-brickPNG = pygame.image.load(r'Assets/brick.png')
-imageBrick = pygame.transform.scale(brickPNG, (50, 50))
-
-def wood():
-    if woodFlag == True:
-        win.blit(imageWood, (woodX, woodY))
-
-def wood2():
-    if wood2Flag == True:
-        win.blit(imageWood, (wood2X, wood2Y))
-
-def coal():
-    if coalFlag == True:
-        win.blit(imageCoal, (coalX, coalY))
-
-def brick():
-    if brickFlag == True:
-        win.blit(imageBrick, (brickX, brickY))
-
-
-def woodCounter():
-    count = myFontMedium.render("Wood: " + str(woodCount), False, WHITE)
-    win.blit(count, (infoObject.current_w - 150, 45))
-
-def coalCounter():
-    count = myFontMedium.render("Coal: " + str(coalCount), False, WHITE)
-    win.blit(count, (infoObject.current_w - 150, 70))
-
-def brickCounter():
-    count = myFontMedium.render("Brick: " + str(brickCount), False, WHITE)
-    win.blit(count, (infoObject.current_w - 150, 95))
+brickPNG = py.image.load(r'Assets/brick.png')
+imageBrick = py.transform.scale(brickPNG, (50, 50))
 
 last_wood_addition_time = 0
 last_coal_addition_time = 0
@@ -825,18 +87,11 @@ last_brick_addition_time = 0
 # </MATERIALS>
 
 run = True
-#previous_ticks = 0
-#fps = 0
-
-# Create a Clock object to control frame rate
-clock = py.time.Clock()
-desiredFps = 165  # Set your desired frame rate here
-
 def startGame():
-    global pos_x, pos_y, run, ticks, realHealthNum, xp, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
-    global woodX, woodY, woodCount, wood2Flag, brickFlag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, last_brick_addition_time, woodSpawnRate, coalFlag, coalCount, brickCount
-    global coalX, coalY, burnerStrength, brickX, brickY
-    global previous_ticks, fps, powerLevel, powerLevelTickRate
+    global pos_x, pos_y, run, ticks, realHealthNum, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
+    global woodX, woodY, wood2Flag, brickFlag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, last_brick_addition_time, coalFlag
+    global coalX, coalY, brickX, brickY
+    global previous_ticks, fps
 
     initialStormSize = 800  #initial stormSize value
     
@@ -917,9 +172,9 @@ def startGame():
         py.draw.circle(win, (53, 120, 2), (infoObject.current_w // 2, infoObject.current_h // 2), int(adjustedStormSize))
 
         #CREATE PLAYER
-        py.draw.rect(win, (colour), (pos_x, pos_y, width, height))
+        py.draw.rect(win, (variables.colour), (pos_x, pos_y, width, height))
 
-        if ticks % burnerStrength == 0 and realDurabilityNum:
+        if ticks % variables.burnerStrength == 0 and realDurabilityNum:
 
             if realDurabilityNum > 0 and realHealthNum > 0:
                 realDurabilityNum -= 1
@@ -941,33 +196,42 @@ def startGame():
                     realHealthNum += 1
                     realHealth = str(realHealthNum)
 
-        xp_conditions = [(xpDivisor, 1), (6000, 150), (18000, 450), (30000, 1000)]
+        xp_conditions = [(variables.xpDivisor, 1), (6000, 150), (18000, 450), (30000, 1000)]
 
         for condition, xp_increment in xp_conditions:
             if ticks % condition == 0 and realHealthNum > 0 and realDurabilityNum > 0:
-                xp += xp_increment
+                variables.xp += xp_increment
 
 
         
         #power level
-        if ticks % powerLevelTickRate == 0:
-            powerLevel += 1
+        if ticks % variables.powerLevelTickRate == 0:
+            variables.powerLevel += 1
 
-        if powerLevel % 4 == 0:
-            powerLevelTickRate -= 30
-            burnerStrength -= 3
+        if variables.powerLevel % 4 == 0 and not hit_multiple_4:
+            hit_multiple_4 = True
 
-            if powerLevelTickRate < 400:
-                powerLevelTickRate = 400
+            variables.powerLevelTickRate -= variables.powerLevelTickDecayRate
 
-        power = myFont.render("Power Level: " + str(powerLevel), False, WHITE)
+            if variables.powerLevelTickRate <= 400:
+                variables.burnerStrength -= variables.strengthDecayMaxPowerLevel
+
+            else:
+                variables.burnerStrength -= variables.strengthDecay
+
+            if variables.powerLevelTickRate < 400:
+                variables.powerLevelTickRate = 400
+        elif variables.powerLevel % 4 != 0:
+            hit_multiple_4 = False
+
+        power = variables.myFontMedium.render("Power Level: " + str(variables.powerLevel), False, WHITE)
         win.blit(power, (10, 130))
-        strength = myFontMedium.render("Burner Strength: " + str(burnerStrength), False, WHITE)
+        strength = variables.myFont.render("Burner Strength: " + str(variables.burnerStrength), False, WHITE)
         win.blit(strength, (10, 170))
 
         #burner
         py.draw.rect(win, (0, 0, 255), (infoObject.current_w / 2 - 35, infoObject.current_h / 2 - 35, 70, 70))
-        text = myFontSmall.render("Burner", False, WHITE)
+        text = variables.myFontSmall.render("Burner", False, WHITE)
         win.blit(text, (infoObject.current_w / 2 - 30, infoObject.current_h / 2 - 15))
 
         burnerTop = infoObject.current_w / 2 - 35
@@ -976,59 +240,67 @@ def startGame():
         burnerRight = infoObject.current_h / 2 - 35 + 70
 
         if playerRight >= burnerLeft and playerLeft <= burnerRight and playerBottom >= burnerTop and playerTop <= burnerBottom:
-            if woodCount > 0:
-                interact = myFontMedium.render("Press 'E' to add wood", False, WHITE)
+            if variables.woodCount > 0:
+                interact = variables.myFont.render("Press 'E' to add wood", False, WHITE)
                 win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 200))
 
                 if keys[py.K_e] and time_since_last_wood_addition >= 500:
-                    woodCount -= 1
+                    variables.woodCount -= 1
                     realDurabilityNum += 25
                     last_wood_addition_time = current_time
-                    xp += 25
+                    variables.xp += 25
 
-            if coalCount > 0:
-                interact = myFontMedium.render("Press 'F' to add coal", False, WHITE)
+            if variables.coalCount > 0:
+                interact = variables.myFont.render("Press 'F' to add coal", False, WHITE)
                 win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 230))
 
                 if keys[py.K_f] and time_since_last_coal_addition >= 500:
-                    coalCount -= 1
+                    variables.coalCount -= 1
                     realDurabilityNum += 50
                     last_coal_addition_time = current_time
-                    xp += 50
+                    variables.xp += 50
 
-            if brickCount > 0:
-                interact = myFontMedium.render("Press 'G' to add Strength", False, WHITE)
+            if variables.brickCount > 0:
+                interact = variables.myFont.render("Press 'G' to add Strength", False, WHITE)
                 win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 260))
 
                 if keys[py.K_g] and time_since_last_brick_addition >= 500:
-                    brickCount -= 1
-                    burnerStrength += 1
+                    variables.brickCount -= 1
+                    variables.burnerStrength += 1
                     last_brick_addition_time = current_time
-                    xp += 35
+                    variables.xp += 35
 
-        woodTop = woodX
-        woodLeft = woodY
-        woodBottom = woodX + 30
-        woodRight = woodY + 30
+        wood_edges = Edges(woodY, woodY + 30, woodX + 30, woodX)
 
-        wood2Top = wood2X
-        wood2Left = wood2Y
-        wood2Bottom = wood2X + 30
-        wood2Right = wood2Y + 30
+        # woodTop = woodX
+        # woodLeft = woodY
+        # woodBottom = woodX + 30
+        # woodRight = woodY + 30
 
-        coalTop = coalX
-        coalLeft = coalY
-        coalBottom = coalX + 30
-        coalRight = coalY + 30
+        wood2_edges = Edges(wood2Y, wood2Y + 30, wood2X + 30, wood2X)
 
-        brickTop = brickX
-        brickLeft = brickY
-        brickBottom = brickX + 30
-        brickRight = brickY + 30
+        # wood2Top = wood2X
+        # wood2Left = wood2Y
+        # wood2Bottom = wood2X + 30
+        # wood2Right = wood2Y + 30
 
-        if playerRight >= woodLeft and playerLeft <= woodRight and playerBottom >= woodTop and playerTop <= woodBottom:
+        coal_edges = Edges(coalY, coalY + 30, coalX + 30, coalX)
+
+        # coalTop = coalX
+        # coalLeft = coalY
+        # coalBottom = coalX + 30
+        # coalRight = coalY + 30
+
+        brick_edges = Edges(brickY, brickY + 30, brickX + 30, brickX)
+
+        # brickTop = brickX
+        # brickLeft = brickY
+        # brickBottom = brickX + 30
+        # brickRight = brickY + 30
+
+        if playerRight >= wood_edges.left and playerLeft <= wood_edges.right and playerBottom >= wood_edges.top and playerTop <= wood_edges.bottom:
             woodFlag = False
-            woodCount += 1
+            variables.woodCount += 1
             #woodSpawnRate = 0
 
         if woodFlag == False and realHealthNum and realDurabilityNum > 0:
@@ -1038,9 +310,9 @@ def startGame():
                 #if woodSpawnRate == 100:
                     #woodFlag = True
 
-        if playerRight >= wood2Left and playerLeft <= wood2Right and playerBottom >= wood2Top and playerTop <= wood2Bottom:
+        if playerRight >= wood2_edges.left and playerLeft <= wood2_edges.right and playerBottom >= wood2_edges.top and playerTop <= wood2_edges.bottom:
             wood2Flag = False
-            woodCount += 1
+            variables.woodCount += 1
             #woodSpawnRate = 0
 
         if wood2Flag == False and realHealthNum and realDurabilityNum > 0:
@@ -1050,18 +322,18 @@ def startGame():
                 #if woodSpawnRate == 100:
                     #wood2Flag = True
 
-        if playerRight >= coalLeft and playerLeft <= coalRight and playerBottom >= coalTop and playerTop <= coalBottom:
+        if playerRight >= coal_edges.left and playerLeft <= coal_edges.right and playerBottom >= coal_edges.top and playerTop <= coal_edges.bottom:
             coalFlag = False
-            coalCount += 1
+            variables.coalCount += 1
 
         if coalFlag == False and realHealthNum and realDurabilityNum > 0:
                 coalX = random.randint(5, 1800)
                 coalY = random.randint(5, 1000)
                 coalFlag = True
 
-        if playerRight >= brickLeft and playerLeft <= brickRight and playerBottom >= brickTop and playerTop <= brickBottom:
+        if playerRight >= brick_edges.left and playerLeft <= brick_edges.right and playerBottom >= brick_edges.top and playerTop <= brick_edges.bottom:
             brickFlag = False
-            brickCount += 1
+            variables.brickCount += 1
 
         if brickFlag == False and realHealthNum and realDurabilityNum > 0:
                 brickX = random.randint(5, 1800)
@@ -1069,7 +341,7 @@ def startGame():
                 brickFlag = True
 
 
-        #timer_display = myFont.render("Time: " + timer_text, False, WHITE)
+        #timer_display = variables.myFont.render("Time: " + timer_text, False, WHITE)
         #win.blit(timer_display, (infoObject.current_w / 2.3, 40))
 
         ingameXpBar()
@@ -1087,10 +359,10 @@ def startGame():
         brickCounter()
         brick()
 
-        #fps_text = myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
+        #fps_text = variables.myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
         #win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
-        fps_text = myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
+        fps_text = variables.myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
         win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
         py.display.update()
@@ -1098,6 +370,271 @@ def startGame():
         clock.tick(desiredFps)
 
     py.quit()
+
+def admin():
+    global realHealth, realHealthNum, stormSize, realDurability, realDurabilityNum
+    keys = py.key.get_pressed()
+
+    if variables.isAdmin == 1:
+
+        if keys[py.K_r]:
+            variables.xp += 1
+
+        if keys[py.K_t]:
+            realHealthNum = int(realHealth)
+            realHealthNum -= 1
+            realHealth = str(realHealthNum)
+
+        if keys[py.K_o]:
+            stormSize -= 1
+
+        if keys[py.K_i]:
+            stormSize += 1
+
+        if keys[py.K_p]:
+            realDurabilityNum = int(realDurability)
+            realDurabilityNum += 1
+            realDurability = str(realDurabilityNum)
+
+progressionW = int(variables.xp) * 250 / int(variables.xpToGo)
+def ingameXpBar():
+    global progressionW
+    progressionW = int(variables.xp) * 250 / int(variables.xpToGo)  # Update progressionW based on current XP and XPToGo
+
+    py.draw.rect(win, (125, 125, 125), (infoObject.current_w / 2.3, infoObject.current_h - 20, 250, 15))
+    py.draw.rect(win, (0, 255, 0), (infoObject.current_w / 2.3, infoObject.current_h - 20, progressionW, 15))
+
+    userLevel = variables.myFontSmall.render("Level: " + str(variables.level), False, WHITE)
+    win.blit(userLevel, (infoObject.current_w / 2.5, infoObject.current_h - 45))
+
+    userXp = variables.myFontSmall.render("Experience: " + str(variables.xp), False, WHITE)
+    win.blit(userXp, (infoObject.current_w / 2.1, infoObject.current_h - 45))
+
+    xpLimit = variables.myFontSmall.render("/ " + str(variables.xpToGo), False, WHITE)
+    win.blit(xpLimit, (infoObject.current_w / 1.75, infoObject.current_h - 45))
+
+def healthBarPlayer():
+    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, brickFlag
+
+    decreaseHealth = realHealthNum * health / 100
+    py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
+    py.draw.rect(win, (0, 255, 0), (20, 40, decreaseHealth, 25))
+    healthDisplay = variables.myFontSmall.render(" | 100", False, WHITE)
+    realHealthDisplay = variables.myFontSmall.render(str(realHealthNum), False, WHITE)
+    player = variables.myFont.render("" + variables.loggedIn, False, WHITE)
+    win.blit(healthDisplay, (45, 43))
+    win.blit(realHealthDisplay, (21, 43))
+    win.blit(player, (21, 10))
+
+    if realHealthNum <= 0:
+        over = True
+        woodFlag = False
+        wood2Flag = False
+        coalFlag = False
+        brickFlag = False
+        variables.coalCount = 0
+        variables.woodCount = 0
+        variables.brickCount = 0
+        variables.powerLevel = 1
+        if variables.setDifficulty == "Easy":
+            variables.burnerStrength = variables.easyStrength
+            variables.powerLevelTickRate = variables.easyPowerTick
+        
+        if variables.setDifficulty == "Medium":
+            variables.burnerStrength = variables.medStrength
+            variables.powerLevelTickRate = variables.medPowerTick
+
+        if variables.setDifficulty == "Hard":
+            variables.burnerStrength = variables.hardStrength
+            variables.powerLevelTickRate = variables.medPowerTick
+        gameOver()
+
+def healthBarBurner():
+    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, brickFlag
+
+    decreaseDurability = realDurabilityNum * durability / 500
+    py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
+    py.draw.rect(win, (255, 140, 0), (20, 100, decreaseDurability, 25))
+    durabilityDisplay = variables.myFontSmall.render(" | 500", False, WHITE)
+    realDurabilityDisplay = variables.myFontSmall.render(str(realDurabilityNum), False, WHITE)
+    burner = variables.myFont.render("Burner", False, WHITE)
+    win.blit(durabilityDisplay, (45, 100))
+    win.blit(realDurabilityDisplay, (21, 100))
+    win.blit(burner, (21, 70))
+
+    if realDurabilityNum > 500:
+        realDurabilityNum = 500
+
+    if realDurabilityNum <= 0:
+        over = True
+        woodFlag = False
+        wood2Flag = False
+        coalFlag = False
+        brickFlag = False
+        variables.coalCount = 0
+        variables.woodCount = 0
+        variables.brickCount = 0
+        variables.powerLevel = 1
+        if variables.setDifficulty == "Easy":
+            variables.burnerStrength = variables.easyStrength
+            variables.powerLevelTickRate = variables.easyPowerTick
+        
+        if variables.setDifficulty == "Medium":
+            variables.burnerStrength = variables.medStrength
+            variables.powerLevelTickRate = variables.medPowerTick
+
+        if variables.setDifficulty == "Hard":
+            variables.burnerStrength = variables.hardStrength
+            variables.powerLevelTickRate = variables.medPowerTick
+        gameOver()
+
+def levelUp():
+    variables.xp = int(variables.xp)
+    variables.xpToGo = int(variables.xpToGo)
+
+    if variables.xp >= variables.xpToGo:
+        variables.xp -= variables.xpToGo
+        initialXP = int(variables.xpToGo * variables.xpToGoMultiplier)
+        variables.xpToGo = round(initialXP, -1)
+        variables.level += 1
+        
+        if variables.level % 10 == 0:
+            variables.currency += 100
+
+        elif variables.level % 5 == 0:
+            variables.currency += 50
+
+        else:
+            variables.currency += 20
+
+        #move database update to a separate thread
+        def update_database():
+            try:
+                connection = sqlite3.connect("user_credentials.db")
+                cursor = connection.cursor()
+
+                cursor.execute("UPDATE users SET level=?, xp=?, xpToGo=?, currency=? WHERE username=?", (variables.level, variables.xp, variables.xpToGo, variables.currency, variables.loggedIn))
+
+                connection.commit()
+                connection.close()
+            except sqlite3.Error as e:
+                print("SQLite error:", e)
+            except Exception as ex:
+                print("Error:", ex)
+
+        #create a new thread for database update
+        db_update_thread = threading.Thread(target=update_database)
+        db_update_thread.start()
+
+def gameOver():
+    global run, realHealthNum, realDurabilityNum
+
+    #create a semi-transparent black surface
+    game_over_surface = py.Surface((1450, 700), py.SRCALPHA)
+    game_over_surface.fill((0, 0, 0, 178))  # The fourth value (178) controls opacity (0-255)
+    win.blit(game_over_surface, (250, 175))
+
+    title = variables.myFontBig.render("Game Over", False, WHITE)
+    win.blit(title, (850, 180))
+
+    mousePos = py.mouse.get_pos()
+
+    saveTop = 765
+    saveLeft = 300
+    saveBottom = saveTop + 70
+    saveRight = saveLeft + 200
+
+    menuTop = 765
+    menuLeft = 1445
+    menuBottom = menuTop + 70
+    menuRight = menuLeft + 200
+
+    py.draw.rect(win, (255, 0, 0), (saveLeft, saveTop, 200, 70))
+    save = variables.myFontBig.render("Save", False, WHITE)
+    win.blit(save, (saveLeft + 45, saveTop - 5))
+
+    if py.mouse.get_pressed()[0]:
+        if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
+            print("Save button clicked")
+            if variables.loggedIn != 'nul':
+                try:
+                    #connect to the database
+                    connection = sqlite3.connect("user_credentials.db")
+                    cursor = connection.cursor()
+
+                    #get the users current xp from the database
+                    cursor.execute("SELECT xp FROM users WHERE username=?", (variables.loggedIn,))
+                    current_xp = cursor.fetchone()[0]
+
+                    cursor.execute("SELECT currency FROM users WHERE username=?", (variables.loggedIn,))
+                    current_currency = cursor.fetchone()[0]
+
+                    #only update the database if the xp has changed
+                    if current_xp != variables.xp:
+                        #update the users xp in the database
+                        cursor.execute("UPDATE users SET xp=? WHERE username=?", (variables.xp, variables.loggedIn))
+
+                        #commit the changes and close the database connection
+                        connection.commit()
+                        connection.close()
+                        print("XP saved successfully.")
+
+                    if current_currency != variables.currency:
+                        cursor.execute("UPDATE users SET currency=? WHERE username=?", (variables.currency, variables.loggedIn))
+
+                        connection.commit()
+                        connection.close()
+                        print("currency saved successfully.")
+
+                    else:
+                        print("XP is unchanged. No update needed.")
+                except sqlite3.Error as e:
+                    print("SQLite error:", e)
+                except Exception as ex:
+                    print("Error:", ex)
+
+    
+    py.draw.rect(win, (255, 0, 0), (menuLeft, menuTop, 200, 70))
+    menu = variables.myFontBig.render("Menu", False, WHITE)
+    win.blit(menu, (menuLeft + 45, menuTop - 5))
+
+    if py.mouse.get_pressed()[0]:
+        if menuLeft <= mousePos[0] <= menuRight and menuTop <= mousePos[1] <= menuBottom:
+            print("Menu button clicked")
+            realDurabilityNum = 500
+            realHealthNum = 100
+            import menu
+            menu.menu()
+            run = False
+
+def wood():
+    if woodFlag == True:
+        win.blit(imageWood, (woodX, woodY))
+
+def wood2():
+    if wood2Flag == True:
+        win.blit(imageWood, (wood2X, wood2Y))
+
+def coal():
+    if coalFlag == True:
+        win.blit(imageCoal, (coalX, coalY))
+
+def brick():
+    if brickFlag == True:
+        win.blit(imageBrick, (brickX, brickY))
+
+
+def woodCounter():
+    count = variables.myFont.render("Wood: " + str(variables.woodCount), False, WHITE)
+    win.blit(count, (infoObject.current_w - 150, 45))
+
+def coalCounter():
+    count = variables.myFont.render("Coal: " + str(variables.coalCount), False, WHITE)
+    win.blit(count, (infoObject.current_w - 150, 70))
+
+def brickCounter():
+    count = variables.myFont.render("Brick: " + str(variables.brickCount), False, WHITE)
+    win.blit(count, (infoObject.current_w - 150, 95))
 
 if __name__ == "__main__":
     startGame()

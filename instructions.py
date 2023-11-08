@@ -1,8 +1,6 @@
 import pygame as py
-from instructions import *
 #from login import userDisplay
 from backButton import *
-from main import userDisplay
 
 py.init()
 
@@ -38,7 +36,8 @@ def instruction():
 
         win.fill((16, 6, 48))
 
-        userDisplay()
+        import menu
+        menu.userDisplay()
 
         back()
 

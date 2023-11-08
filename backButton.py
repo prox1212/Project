@@ -19,6 +19,7 @@ def back():
     global run
 
     mousePos = py.mouse.get_pos()
+    keys = py.key.get_pressed()
 
     backTop = infoObject.current_h / 1.09
     backLeft = infoObject.current_w / 1.13
@@ -31,6 +32,11 @@ def back():
 
     if py.mouse.get_pressed()[0]:
         if backLeft <= mousePos[0] <= backRight and backTop <= mousePos[1] <= backBottom:
+            import menu
+            menu.menu()
+            run = False
+
+        if keys[py.K_ESCAPE]:
             import menu
             menu.menu()
             run = False

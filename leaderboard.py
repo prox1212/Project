@@ -1,8 +1,8 @@
 import pygame as py
 import sqlite3
 from backButton import *
-from main import *
 #from login import *
+from vars import *
 
 py.init()
 
@@ -12,13 +12,29 @@ win = py.display.set_mode((infoObject.current_w, infoObject.current_h))
 
 py.display.set_caption("Fight the Storm")
 
-py.font.init()
-myFont = py.font.SysFont('Comic Sans MS', 16)
-myFontMedium = py.font.SysFont('Comic Sans MS', 35)
-myFontBig = py.font.SysFont('Comic Sans MS', 50)
-
 WHITE = (255, 255, 255)
 GREY = (201, 201, 199)
+
+def userBigDisplay():
+    usern = variables.myFontBig.render(" " + variables.loggedIn, False, WHITE)
+    win.blit(usern, (infoObject.current_w - 300, 110))
+
+def levelXPDisplayInvert():
+    userLevel = variables.myFontMedium.render("Level: " + str(variables.level), False, WHITE)
+    variables.win.blit(userLevel, (infoObject.current_w - 350, 300))
+
+    userXp = variables.myFontMedium.render("Experience: " + str(variables.xp), False, WHITE)
+    variables.win.blit(userXp, (infoObject.current_w - 350, 400))
+
+    xpLimit = variables.myFontMedium.render("XP To Level Up: " + str(variables.xpToGo), False, WHITE)
+    variables.win.blit(xpLimit, (infoObject.current_w - 350, 485))
+
+    progress = variables.myFont.render("Progress:", False, WHITE)
+    variables.win.blit(progress, (infoObject.current_w - 350, 565))
+
+    progressionW = int(variables.xp) * 250 / int(variables.xpToGo)
+    py.draw.rect(variables.win, (125, 125, 125), (infoObject.current_w - 350, 600, 250, 15))
+    py.draw.rect(variables.win, (0, 255, 0), (infoObject.current_w - 350, 600, progressionW, 15))
 
 def createDatabase():
     connection = sqlite3.connect("user_credentials.db")
@@ -88,9 +104,6 @@ def leaderboard():
             userBigDisplay()
             levelXPDisplayInvert()
             back()
-
-            fps_text = myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
-            win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
         py.display.update()
 

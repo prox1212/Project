@@ -47,7 +47,7 @@ class variables:
     white = 0
     orange = 0
 
-    woodSpawnRate = 0
+    #woodSpawnRate = 0
 
     #storm
     burnerStrength = 8

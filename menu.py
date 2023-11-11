@@ -99,7 +99,7 @@ def loginUser():
             variables.red = user[7]
             variables.white = user[8]
             variables.orange = user[9]
-            messagebox.shovariables.winfo("Login Successful", "Welcome, " + entered_username + "!")
+            messagebox.showinfo("Login Successful", "Welcome, " + entered_username + "!")
         else:
             messagebox.showerror("Login Failed", "Invalid username or password.")
 

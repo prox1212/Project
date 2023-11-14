@@ -86,6 +86,38 @@ last_brick_addition_time = 0
 
 # </MATERIALS>
 
+class Player:
+    def __init__(self, playerTop, playerLeft, playerBottom, playerRight):
+        self.playerTop = playerTop
+        self.playerLeft = playerLeft
+        self.playerBottom = playerBottom
+        self.playerRight = playerRight
+
+        #player movement
+        global pos_x, pos_y
+
+        keys = py.key.get_pressed()
+
+        if keys[py.K_LEFT] or keys[py.K_a] and pos_x > 0:
+            pos_x -= velocity
+
+        if keys[py.K_RIGHT] or keys[py.K_d] and pos_x < infoObject.current_w - width:
+            pos_x += velocity
+
+        if keys[py.K_UP] or keys[py.K_w] and pos_y > 0:
+            pos_y -= velocity
+
+        if keys[py.K_DOWN] or keys[py.K_s] and pos_y < infoObject.current_h - height:
+            pos_y += velocity
+
+    def playerSize(self):
+        return (self.playerTop, self.playerLeft, self.playerBottom, self.playerRight)
+
+    def createPlayer():
+        #CREATE PLAYER
+        py.draw.rect(win, (variables.colour), (pos_x, pos_y, width, height))
+
+
 run = True
 def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
@@ -104,20 +136,11 @@ def startGame():
         #clock.tick(desiredFps)
         fps = int(clock.get_fps())
 
-        #if ticks % 20 == 0:
-            #fps = 1000 / (current_time - previous_ticks)
-
         previous_ticks = current_time
 
         time_since_last_wood_addition = current_time - last_wood_addition_time
         time_since_last_coal_addition = current_time - last_coal_addition_time
         time_since_last_brick_addition = current_time - last_brick_addition_time
-
-        #start_time = 0
-
-        #def time():
-            #global start_time
-            #start_time = py.time.get_ticks()
 
         for event in py.event.get():
             if event.type == py.QUIT:
@@ -125,37 +148,7 @@ def startGame():
 
         keys = py.key.get_pressed()
 
-        if keys[py.K_LEFT] or keys[py.K_a] and pos_x > 0:
-            pos_x -= velocity
-
-        if keys[py.K_RIGHT] or keys[py.K_d] and pos_x < infoObject.current_w - width:
-            pos_x += velocity
-
-        if keys[py.K_UP] or keys[py.K_w] and pos_y > 0:
-            pos_y -= velocity
-
-        if keys[py.K_DOWN] or keys[py.K_s] and pos_y < infoObject.current_h - height:
-            pos_y += velocity
-
-        #current_time = py.time.get_ticks()  # Get the current time in milliseconds
-
-        #calculate the elapsed time in milliseconds
-        #elapsed_time = current_time - start_time
-
-        #calculate minutes and seconds
-        #minutes = (elapsed_time // 1000) // 60
-        #seconds = (elapsed_time // 1000) % 60
-
-        #format the timer as "00:00"
-        #timer_text = f"{minutes:02}:{seconds:02}"
-
-        #py.time.delay(10)
-        #ticks += 1  # Increment ticks
-
-        playerTop = pos_x
-        playerLeft = pos_y
-        playerBottom = pos_x + width
-        playerRight = pos_y + height
+        player_edges = Player(pos_x, pos_y, pos_x + width, pos_y + height)
 
         #calculate the distance between the player and the center of the circle
         distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
@@ -170,9 +163,6 @@ def startGame():
 
         #draw the storm (circle) with the adjusted size
         py.draw.circle(win, (53, 120, 2), (infoObject.current_w // 2, infoObject.current_h // 2), int(adjustedStormSize))
-
-        #CREATE PLAYER
-        py.draw.rect(win, (variables.colour), (pos_x, pos_y, width, height))
 
         if ticks % variables.burnerStrength == 0 and realDurabilityNum:
 
@@ -239,7 +229,7 @@ def startGame():
         burnerBottom = infoObject.current_w / 2 - 35 + 70
         burnerRight = infoObject.current_h / 2 - 35 + 70
 
-        if playerRight >= burnerLeft and playerLeft <= burnerRight and playerBottom >= burnerTop and playerTop <= burnerBottom:
+        if player_edges.playerRight >= burnerLeft and player_edges.playerLeft <= burnerRight and player_edges.playerBottom >= burnerTop and player_edges.playerTop <= burnerBottom:
             if variables.woodCount > 0:
                 interact = variables.myFont.render("Press 'E' to add wood", False, WHITE)
                 win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 200))
@@ -272,57 +262,31 @@ def startGame():
 
         wood_edges = Edges(woodY, woodY + 30, woodX + 30, woodX)
 
-        # woodTop = woodX
-        # woodLeft = woodY
-        # woodBottom = woodX + 30
-        # woodRight = woodY + 30
-
         wood2_edges = Edges(wood2Y, wood2Y + 30, wood2X + 30, wood2X)
-
-        # wood2Top = wood2X
-        # wood2Left = wood2Y
-        # wood2Bottom = wood2X + 30
-        # wood2Right = wood2Y + 30
 
         coal_edges = Edges(coalY, coalY + 30, coalX + 30, coalX)
 
-        # coalTop = coalX
-        # coalLeft = coalY
-        # coalBottom = coalX + 30
-        # coalRight = coalY + 30
-
         brick_edges = Edges(brickY, brickY + 30, brickX + 30, brickX)
 
-        # brickTop = brickX
-        # brickLeft = brickY
-        # brickBottom = brickX + 30
-        # brickRight = brickY + 30
-
-        if playerRight >= wood_edges.left and playerLeft <= wood_edges.right and playerBottom >= wood_edges.top and playerTop <= wood_edges.bottom:
+        if player_edges.playerRight >= wood_edges.left and player_edges.playerLeft <= wood_edges.right and player_edges.playerBottom >= wood_edges.top and player_edges.playerTop <= wood_edges.bottom:
             woodFlag = False
             variables.woodCount += 1
-            #woodSpawnRate = 0
 
         if woodFlag == False and realHealthNum and realDurabilityNum > 0:
                 woodX = random.randint(5, 1800)
                 woodY = random.randint(5, 1000)
                 woodFlag = True
-                #if woodSpawnRate == 100:
-                    #woodFlag = True
 
-        if playerRight >= wood2_edges.left and playerLeft <= wood2_edges.right and playerBottom >= wood2_edges.top and playerTop <= wood2_edges.bottom:
+        if player_edges.playerRight >= wood2_edges.left and player_edges.playerLeft <= wood2_edges.right and player_edges.playerBottom >= wood2_edges.top and player_edges.playerTop <= wood2_edges.bottom:
             wood2Flag = False
             variables.woodCount += 1
-            #woodSpawnRate = 0
 
         if wood2Flag == False and realHealthNum and realDurabilityNum > 0:
                 wood2X = random.randint(5, 1800)
                 wood2Y = random.randint(5, 1000)
                 wood2Flag = True
-                #if woodSpawnRate == 100:
-                    #wood2Flag = True
 
-        if playerRight >= coal_edges.left and playerLeft <= coal_edges.right and playerBottom >= coal_edges.top and playerTop <= coal_edges.bottom:
+        if player_edges.playerRight >= coal_edges.left and player_edges.playerLeft <= coal_edges.right and player_edges.playerBottom >= coal_edges.top and player_edges.playerTop <= coal_edges.bottom:
             coalFlag = False
             variables.coalCount += 1
 
@@ -331,7 +295,7 @@ def startGame():
                 coalY = random.randint(5, 1000)
                 coalFlag = True
 
-        if playerRight >= brick_edges.left and playerLeft <= brick_edges.right and playerBottom >= brick_edges.top and playerTop <= brick_edges.bottom:
+        if player_edges.playerRight >= brick_edges.left and player_edges.playerLeft <= brick_edges.right and player_edges.playerBottom >= brick_edges.top and player_edges.playerTop <= brick_edges.bottom:
             brickFlag = False
             variables.brickCount += 1
 
@@ -340,27 +304,21 @@ def startGame():
                 brickY = random.randint(5, 1000)
                 brickFlag = True
 
-
-        #timer_display = variables.myFont.render("Time: " + timer_text, False, WHITE)
-        #win.blit(timer_display, (infoObject.current_w / 2.3, 40))
-
-        ingameXpBar()
         levelUp()
-        healthBarPlayer()
-        back()
-        healthBarBurner()
         admin()
-        #time()
         wood()
         wood2()
-        woodCounter()
         coal()
+        brick()
+        Player.createPlayer()
+        ingameXpBar()
+        healthBarPlayer()
+        healthBarBurner()
+        back()
+        woodCounter()
         coalCounter()
         brickCounter()
-        brick()
 
-        #fps_text = variables.myFontSmall.render("FPS:{:0.2f} ".format(fps), False, WHITE)
-        #win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
         fps_text = variables.myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
         win.blit(fps_text, (infoObject.current_w - 100 , 10))

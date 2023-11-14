@@ -227,7 +227,7 @@ def startGame():
         text = variables.myFontSmall.render("Burner", False, WHITE)
         win.blit(text, (infoObject.current_w / 2 - 30, infoObject.current_h / 2 - 15))
 
-        burner_edges = Edges(infoObject.current_h / 2 - 35, infoObject.current_h / 2 - 35 + 70, infoObject.current_w / 2 - 35 + 70, burnerTop = infoObject.current_w / 2 - 35)
+        burner_edges = Edges(infoObject.current_h / 2 - 35, infoObject.current_h / 2 - 35 + 70, infoObject.current_w / 2 - 35 + 70, infoObject.current_w / 2 - 35)
 
         if player_edges.playerRight >= burner_edges.left and player_edges.playerLeft <= burner_edges.right and player_edges.playerBottom >= burner_edges.top and player_edges.playerTop <= burner_edges.bottom:
             if variables.woodCount > 0:

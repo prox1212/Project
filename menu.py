@@ -259,7 +259,7 @@ def difficulty():
 def save():
     mousePos = py.mouse.get_pos()
 
-    save_edges = Edges(35, 235, 135, 205)
+    save_edges = Edges(35, 235, 205, 135)
 
     py.draw.rect(variables.win, (255, 0, 0), (save_edges.left, save_edges.top, 200, 70))
     save = variables.myFontBig.render("Save", False, WHITE)

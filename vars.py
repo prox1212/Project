@@ -15,12 +15,14 @@ class variables:
     WHITE = (255, 255, 255)
     BLUE = (12, 60, 179)
 
+    py.font.init()
     myFont = py.font.SysFont('Comic Sans MS', 24)
     myFontMedium = py.font.SysFont('Comic Sans MS', 35)
     myFontSmall = py.font.SysFont('Comic Sans MS', 16)
     myFontBig = py.font.SysFont('Comic Sans MS', 50)
 
     # fullscreen
+    py.init()
     infoObject = py.display.Info()
     win = py.display.set_mode((infoObject.current_w, infoObject.current_h))
 

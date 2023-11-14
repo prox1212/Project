@@ -110,12 +110,15 @@ class Player:
         if keys[py.K_DOWN] or keys[py.K_s] and pos_y < infoObject.current_h - height:
             pos_y += velocity
 
+        #player interactions
+
     def playerSize(self):
         return (self.playerTop, self.playerLeft, self.playerBottom, self.playerRight)
 
     def createPlayer():
         #CREATE PLAYER
         py.draw.rect(win, (variables.colour), (pos_x, pos_y, width, height))
+        
 
 
 run = True
@@ -224,12 +227,9 @@ def startGame():
         text = variables.myFontSmall.render("Burner", False, WHITE)
         win.blit(text, (infoObject.current_w / 2 - 30, infoObject.current_h / 2 - 15))
 
-        burnerTop = infoObject.current_w / 2 - 35
-        burnerLeft = infoObject.current_h / 2 - 35
-        burnerBottom = infoObject.current_w / 2 - 35 + 70
-        burnerRight = infoObject.current_h / 2 - 35 + 70
+        burner_edges = Edges(infoObject.current_h / 2 - 35, infoObject.current_h / 2 - 35 + 70, infoObject.current_w / 2 - 35 + 70, burnerTop = infoObject.current_w / 2 - 35)
 
-        if player_edges.playerRight >= burnerLeft and player_edges.playerLeft <= burnerRight and player_edges.playerBottom >= burnerTop and player_edges.playerTop <= burnerBottom:
+        if player_edges.playerRight >= burner_edges.left and player_edges.playerLeft <= burner_edges.right and player_edges.playerBottom >= burner_edges.top and player_edges.playerTop <= burner_edges.bottom:
             if variables.woodCount > 0:
                 interact = variables.myFont.render("Press 'E' to add wood", False, WHITE)
                 win.blit(interact, (infoObject.current_w / 2 - 120, infoObject.current_h / 2 - 200))
@@ -497,22 +497,17 @@ def gameOver():
 
     mousePos = py.mouse.get_pos()
 
-    saveTop = 765
-    saveLeft = 300
-    saveBottom = saveTop + 70
-    saveRight = saveLeft + 200
 
-    menuTop = 765
-    menuLeft = 1445
-    menuBottom = menuTop + 70
-    menuRight = menuLeft + 200
+    save_edges = Edges(300, 500, 835, 765)
 
-    py.draw.rect(win, (255, 0, 0), (saveLeft, saveTop, 200, 70))
+    menu_edges = Edges(1445, 1645, 835, 765)
+
+    py.draw.rect(win, (255, 0, 0), (save_edges.left, save_edges.top, 200, 70))
     save = variables.myFontBig.render("Save", False, WHITE)
-    win.blit(save, (saveLeft + 45, saveTop - 5))
+    win.blit(save, (save_edges.left + 45, save_edges.top - 5))
 
     if py.mouse.get_pressed()[0]:
-        if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
+        if save_edges.left <= mousePos[0] <= save_edges.right and save_edges.top <= mousePos[1] <= save_edges.bottom:
             print("Save button clicked")
             if variables.loggedIn != 'nul':
                 try:
@@ -552,12 +547,12 @@ def gameOver():
                     print("Error:", ex)
 
     
-    py.draw.rect(win, (255, 0, 0), (menuLeft, menuTop, 200, 70))
+    py.draw.rect(win, (255, 0, 0), (menu_edges.left, menu_edges.top, 200, 70))
     menu = variables.myFontBig.render("Menu", False, WHITE)
-    win.blit(menu, (menuLeft + 45, menuTop - 5))
+    win.blit(menu, (menu_edges.left + 45, menu_edges.top - 5))
 
     if py.mouse.get_pressed()[0]:
-        if menuLeft <= mousePos[0] <= menuRight and menuTop <= mousePos[1] <= menuBottom:
+        if menu_edges.left <= mousePos[0] <= menu_edges.right and menu_edges.top <= mousePos[1] <= menu_edges.bottom:
             print("Menu button clicked")
             realDurabilityNum = 500
             realHealthNum = 100

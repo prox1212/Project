@@ -69,15 +69,11 @@ def displayLeaderboard():
 # Call this function in your main loop to display the leaderboard
 run = True
 
-clock = py.time.Clock()
-desiredFps = 165
 
 def leaderboard():
     global run
     while run:
         py.time.delay(10)
-        
-        fps = int(clock.get_fps())
 
         for event in py.event.get():
             if event.type == py.QUIT:

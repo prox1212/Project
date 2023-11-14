@@ -13,48 +13,18 @@ infoObject = py.display.Info()
 
 py.display.set_caption("Fight the Storm")
 
-# py.font.init()
-# variables.myFont = py.font.SysFont('Comic Sans MS', 16)
-# variables.myFontMedium = py.font.SysFont('Comic Sans MS', 35)
-# variables.myFontBig = py.font.SysFont('Comic Sans MS', 50)
-
+#<MENU>
 buttonWidth = 300
 buttonHeight = 80
 
-playTop = infoObject.current_h / 3.3
-playLeft = infoObject.current_w / 2.4
-playBottom = infoObject.current_h / 3.3 + buttonHeight
-playRight = infoObject.current_w / 2.4 + buttonWidth
-
-instructionsTop = infoObject.current_h / 2.5
-instructionsLeft = infoObject.current_w / 2.4
-instructionsBottom = infoObject.current_h / 2.5 + buttonHeight
-instructionsRight = infoObject.current_w / 2.4 + buttonWidth
-
-loginTop = infoObject.current_h / 2
-loginLeft = infoObject.current_w / 2.4
-loginBottom = infoObject.current_h / 2 + buttonHeight
-loginRight = infoObject.current_w / 2.4 + buttonWidth
-
-registerTop = infoObject.current_h / 1.66
-registerLeft = infoObject.current_w / 2.4
-registerBottom = infoObject.current_h / 1.62 + buttonHeight
-registerRight = infoObject.current_w / 2.4 + buttonWidth
-
-leaderboardTop = infoObject.current_h / 1.3
-leaderboardLeft = infoObject.current_w / 2.4
-leaderboardBottom = infoObject.current_h / 1.3 + buttonHeight
-leaderboardRight = infoObject.current_w / 2.4 + buttonWidth
-
-customTop = infoObject.current_h / 2
-customLeft = infoObject.current_w / 1.3
-customBottom = infoObject.current_h / 2 + buttonHeight
-customRight = infoObject.current_w / 1.3 + buttonWidth
-
-difficultyTop = infoObject.current_h / 2.45
-difficultyLeft = infoObject.current_w / 1.3
-difficultyBottom = infoObject.current_h / 2.45 + buttonHeight
-difficultyRight = infoObject.current_w / 1.3 + buttonWidth
+play_edges = Edges(infoObject.current_w / 2.4, infoObject.current_w / 2.4 + buttonWidth, infoObject.current_h / 3.3 + buttonHeight, infoObject.current_h / 3.3)
+instructions_edges = Edges(infoObject.current_w / 2.4, infoObject.current_w / 2.4 + buttonWidth, infoObject.current_h / 2.5 + buttonHeight, infoObject.current_h / 2.5)
+login_edges = Edges(infoObject.current_w / 2.4, infoObject.current_w / 2.4 + buttonWidth, infoObject.current_h / 2 + buttonHeight, infoObject.current_h / 2)
+register_edges = Edges(infoObject.current_w / 2.4, infoObject.current_w / 2.4 + buttonWidth, infoObject.current_h / 1.62 + buttonHeight, infoObject.current_h / 1.66)
+leaderboard_edges = Edges(infoObject.current_w / 2.4, infoObject.current_w / 2.4 + buttonWidth, infoObject.current_h / 1.3 + buttonHeight, infoObject.current_h / 1.3)
+custom_edges = Edges(infoObject.current_w / 1.3, infoObject.current_w / 1.3 + buttonWidth, infoObject.current_h / 2 + buttonHeight, infoObject.current_h / 2)
+difficulty_edges = Edges(infoObject.current_w / 1.3, infoObject.current_w / 1.3 + buttonWidth, infoObject.current_h / 2.45 + buttonHeight, infoObject.current_h / 2.45)
+#</MENU>
 
 # <ITEM SHOP>
 colourButtonWidth = 75
@@ -230,25 +200,8 @@ def difficulty():
     global run
 
     easy_edges = Edges(150, 450, 375, 300)
-
-    # easyTop = 300
-    # easyLeft = 150
-    # easyBottom = 300 + 75
-    # easyRight = 150 + 300
-
     medium_edges = Edges(150, 450, 485, 410)
-
-    # mediumTop = 410
-    # mediumLeft = 150
-    # mediumBottom = 410 + 75
-    # mediumRight = 150 + 300
-
     hard_edges = Edges(150, 450, 595, 520)
-
-    # hardTop = 520
-    # hardLeft = 150
-    # hardBottom = 520 + 75
-    # hardRight = 150 + 300
 
     while run:
         py.time.delay(10)
@@ -306,17 +259,14 @@ def difficulty():
 def save():
     mousePos = py.mouse.get_pos()
 
-    saveTop = 135
-    saveLeft = 35
-    saveBottom = saveTop + 70
-    saveRight = saveLeft + 200
+    save_edges = Edges(35, 235, 135, 205)
 
-    py.draw.rect(variables.win, (255, 0, 0), (saveLeft, saveTop, 200, 70))
+    py.draw.rect(variables.win, (255, 0, 0), (save_edges.left, save_edges.top, 200, 70))
     save = variables.myFontBig.render("Save", False, WHITE)
-    variables.win.blit(save, (saveLeft + 45, saveTop - 5))
+    variables.win.blit(save, (save_edges.left + 45, save_edges.top - 5))
 
     if py.mouse.get_pressed()[0]:
-        if saveLeft <= mousePos[0] <= saveRight and saveTop <= mousePos[1] <= saveBottom:
+        if save_edges.left <= mousePos[0] <= save_edges.right and save_edges.top <= mousePos[1] <= save_edges.bottom:
             print("Save button clicked")
             if variables.loggedIn != 'nul':
                 try:
@@ -438,17 +388,14 @@ def exit():
 
     mousePos = py.mouse.get_pos()
 
-    backTop = infoObject.current_h / infoObject.current_h + 35
-    backLeft = infoObject.current_w / infoObject.current_w + 35
-    backBottom = infoObject.current_h / infoObject.current_w + 35 + 70
-    backRight = infoObject.current_w / infoObject.current_w + 35 + 200
+    exit_edges = Edges(infoObject.current_w / infoObject.current_w + 35, infoObject.current_w / infoObject.current_w + 35 + 200, infoObject.current_h / infoObject.current_w + 35 + 70, infoObject.current_h / infoObject.current_h + 35)
 
     py.draw.rect(variables.win, (255, 0, 0), (infoObject.current_w / infoObject.current_w + 35, infoObject.current_h / infoObject.current_h + 35, 200, 70))
     back = variables.myFontBig.render("Exit", False, WHITE)
     variables.win.blit(back, (infoObject.current_w / infoObject.current_w + 80, infoObject.current_h / infoObject.current_h + 35))
 
     if py.mouse.get_pressed()[0]:
-        if backLeft <= mousePos[0] <= backRight and backTop <= mousePos[1] <= backBottom:
+        if exit_edges.left <= mousePos[0] <= exit_edges.right and exit_edges.top <= mousePos[1] <= exit_edges.bottom:
 
             run = False
 
@@ -499,50 +446,39 @@ def menu():
 
         admin()
 
-        # if py.mouse.get_pressed()[0]:
-        #     if loggedIn == 'nul':
-        #         print("Login nul")
-        #         toPlay = variables.myFontBig.render("You need to login to play!", False, WHITE)
-        #         variables.win.blit(toPlay, (infoObject.current_w / 2.6, infoObject.current_h / 1.2))
-
-        #     if loggedIn != 'nul':
-        #         if playLeft <= mousePos[0] <= playRight and playTop <= mousePos[1] <= playBottom:
-        #             print("Play button clicked")
-        #             startGame()
-        
         if py.mouse.get_pressed()[0]:
-            if playLeft <= mousePos[0] <= playRight and playTop <= mousePos[1] <= playBottom:
+            if play_edges.left <= mousePos[0] <= play_edges.right and play_edges.top <= mousePos[1] <= play_edges.bottom:
                 print("Play button clicked")
                 startGame()
 
         if py.mouse.get_pressed()[0]:
-            if instructionsLeft <= mousePos[0] <= instructionsRight and instructionsTop <= mousePos[1] <= instructionsBottom:
+            if instructions_edges.left <= mousePos[0] <= instructions_edges.right and instructions_edges.top <= mousePos[1] <= instructions_edges.bottom:
                 print("Instructions button clicked")
                 instruction()
 
         if py.mouse.get_pressed()[0]:
-            if registerLeft <= mousePos[0] <= registerRight and registerTop <= mousePos[1] <= registerBottom:
+            if register_edges.left <= mousePos[0] <= register_edges.right and register_edges.top <= mousePos[1] <= register_edges.bottom:
                 print("Register button clicked")
                 registerUser()
 
         if py.mouse.get_pressed()[0]:
-            if loginLeft <= mousePos[0] <= loginRight and loginTop <= mousePos[1] <= loginBottom:
+            if login_edges.left <= mousePos[0] <= login_edges.right and login_edges.top <= mousePos[1] <= login_edges.bottom:
                 print("Login button clicked")
                 loginUser()
 
         if py.mouse.get_pressed()[0]:
-            if leaderboardLeft <= mousePos[0] <= leaderboardRight and leaderboardTop <= mousePos[1] <= leaderboardBottom:
+            if leaderboard_edges.left <= mousePos[0] <= leaderboard_edges.right and leaderboard_edges.top <= mousePos[1] <= leaderboard_edges.bottom:
                 print("Leaderboard button clicked")
                 leaderboard()
                 run = False
 
         if py.mouse.get_pressed()[0]:
-            if customLeft <= mousePos[0] <= customRight and customTop <= mousePos[1] <= customBottom:
+            if custom_edges.left <= mousePos[0] <= custom_edges.right and custom_edges.top <= mousePos[1] <= custom_edges.bottom:
                 print("Custom button clicked")
                 colourChange()
 
         if py.mouse.get_pressed()[0]:
-            if difficultyLeft <= mousePos[0] <= difficultyRight and difficultyTop <= mousePos[1] <= difficultyBottom:
+            if difficulty_edges.left <= mousePos[0] <= difficulty_edges.right and difficulty_edges.top <= mousePos[1] <= difficulty_edges.bottom:
                 print("Difficulty button clicked")
                 difficulty()
 

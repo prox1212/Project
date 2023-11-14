@@ -1,4 +1,5 @@
 import pygame as py
+from vars import Edges
 
 py.init()
 
@@ -21,17 +22,14 @@ def back():
     mousePos = py.mouse.get_pos()
     keys = py.key.get_pressed()
 
-    backTop = infoObject.current_h / 1.09
-    backLeft = infoObject.current_w / 1.13
-    backBottom = infoObject.current_h / 1.09 + 70
-    backRight = infoObject.current_w / 1.13 + 200
+    back_edges = Edges(infoObject.current_w / 1.13, infoObject.current_w / 1.13 + 200, infoObject.current_h / 1.09 + 70, infoObject.current_h / 1.09)
 
     py.draw.rect(win, (255, 0, 0), (infoObject.current_w / 1.13, infoObject.current_h / 1.09, 200, 70))
     back = myFontBig.render("Back", False, WHITE)
     win.blit(back, (infoObject.current_w / 1.1, infoObject.current_h / 1.09))
 
     if py.mouse.get_pressed()[0]:
-        if backLeft <= mousePos[0] <= backRight and backTop <= mousePos[1] <= backBottom:
+        if back_edges.left <= mousePos[0] <= back_edges.right and back_edges.top <= mousePos[1] <= back_edges.bottom:
             import menu
             menu.menu()
             run = False

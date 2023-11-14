@@ -17,18 +17,12 @@ myFontBig = py.font.SysFont('Comic Sans MS', 50)
 
 WHITE = (255, 255, 255)
 
-clock = py.time.Clock()
-desiredFps = 165
-
 run = True
 
 def instruction():
     global run
     while run:
         py.time.delay(10)
-
-        #clock.tick(desiredFps)
-        fps = int(clock.get_fps())
 
         for event in py.event.get():
             if event.type == py.QUIT:
@@ -40,9 +34,6 @@ def instruction():
         menu.userDisplay()
 
         back()
-
-        fps_text = myFont.render(f'FPS: {fps}', True, (255, 255, 255))
-        win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
         py.display.update()
 

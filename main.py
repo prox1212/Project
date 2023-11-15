@@ -87,40 +87,99 @@ last_brick_addition_time = 0
 # </MATERIALS>
 
 class Player:
+
+    def __init__(self, x, y, width, height, velocity):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.velocity = velocity
+
+    def handle_input(self):
+        keys = py.key.get_pressed()
+
+        if keys[py.K_LEFT] or keys[py.K_a] and self.x > 0:
+            self.x -= self.velocity
+
+        if keys[py.K_RIGHT] or keys[py.K_d] and self.x > 0:
+            self.x += self.velocity
+
+        if keys[py.K_UP] or keys[py.K_w] and self.y > 0:
+            self.y -= self.velocity
+        
+        if keys[py.K_DOWN] or keys[py.K_s] and self.y > 0:
+            self.y += self.velocity
+
+    def update_position(self):
+         global pos_x, pos_y
+         pos_x = self.x
+         pos_y = self.y
+
+    def draw(self):
+        # Draw the player on the screen
+        py.draw.rect(win, (variables.colour), (self.x, self.y, self.width, self.height))
+
+    def get_player_size(self):
+        return (self.x, self.y, self.x + self.width, self.y + self.height)
+
+    def woodCounter(self):
+        count = variables.myFont.render("Wood: " + str(variables.woodCount), False, WHITE)
+        win.blit(count, (infoObject.current_w - 150, 45))
+
+    def coalCounter(self):
+        count = variables.myFont.render("Coal: " + str(variables.coalCount), False, WHITE)
+        win.blit(count, (infoObject.current_w - 150, 70))
+
+    def brickCounter(self):
+        count = variables.myFont.render("Brick: " + str(variables.brickCount), False, WHITE)
+        win.blit(count, (infoObject.current_w - 150, 95))
+
+    def healthBarPlayer():
+        global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, brickFlag
+
+        decreaseHealth = realHealthNum * health / 100
+        py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
+        py.draw.rect(win, (0, 255, 0), (20, 40, decreaseHealth, 25))
+        healthDisplay = variables.myFontSmall.render(" | 100", False, WHITE)
+        realHealthDisplay = variables.myFontSmall.render(str(realHealthNum), False, WHITE)
+        player = variables.myFont.render("" + variables.loggedIn, False, WHITE)
+        win.blit(healthDisplay, (45, 43))
+        win.blit(realHealthDisplay, (21, 43))
+        win.blit(player, (21, 10))
+
+        if realHealthNum <= 0:
+            over = True
+            woodFlag = False
+            wood2Flag = False
+            coalFlag = False
+            brickFlag = False
+            variables.coalCount = 0
+            variables.woodCount = 0
+            variables.brickCount = 0
+            variables.powerLevel = 1
+            if variables.setDifficulty == "Easy":
+                variables.burnerStrength = variables.easyStrength
+                variables.powerLevelTickRate = variables.easyPowerTick
+
+            if variables.setDifficulty == "Medium":
+                variables.burnerStrength = variables.medStrength
+                variables.powerLevelTickRate = variables.medPowerTick
+
+            if variables.setDifficulty == "Hard":
+                variables.burnerStrength = variables.hardStrength
+                variables.powerLevelTickRate = variables.medPowerTick
+            gameOver()
+
+class PlayerEdges:
     def __init__(self, playerTop, playerLeft, playerBottom, playerRight):
         self.playerTop = playerTop
         self.playerLeft = playerLeft
         self.playerBottom = playerBottom
         self.playerRight = playerRight
 
-        #player movement
-        global pos_x, pos_y
-
-        keys = py.key.get_pressed()
-
-        if keys[py.K_LEFT] or keys[py.K_a] and pos_x > 0:
-            pos_x -= velocity
-
-        if keys[py.K_RIGHT] or keys[py.K_d] and pos_x < infoObject.current_w - width:
-            pos_x += velocity
-
-        if keys[py.K_UP] or keys[py.K_w] and pos_y > 0:
-            pos_y -= velocity
-
-        if keys[py.K_DOWN] or keys[py.K_s] and pos_y < infoObject.current_h - height:
-            pos_y += velocity
-
-        #player interactions
-
     def playerSize(self):
         return (self.playerTop, self.playerLeft, self.playerBottom, self.playerRight)
-
-    def createPlayer():
-        #CREATE PLAYER
-        py.draw.rect(win, (variables.colour), (pos_x, pos_y, width, height))
-        
-
-
+    
 run = True
 def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
@@ -151,7 +210,8 @@ def startGame():
 
         keys = py.key.get_pressed()
 
-        player_edges = Player(pos_x, pos_y, pos_x + width, pos_y + height)
+        player = Player(pos_x, pos_y, width, height, velocity)
+        player_edges = PlayerEdges(pos_x, pos_y, pos_x + width, pos_y + height)
 
         #calculate the distance between the player and the center of the circle
         distance = ((infoObject.current_w // 2 - pos_x) ** 2 + (infoObject.current_h // 2 - pos_y) ** 2) ** 0.5
@@ -304,20 +364,22 @@ def startGame():
                 brickY = random.randint(5, 1000)
                 brickFlag = True
 
+        player.handle_input()
+        player.update_position()
         levelUp()
         admin()
         wood()
         wood2()
         coal()
         brick()
-        Player.createPlayer()
+        player.draw()
         ingameXpBar()
-        healthBarPlayer()
+        Player.healthBarPlayer()
         healthBarBurner()
         back()
-        woodCounter()
-        coalCounter()
-        brickCounter()
+        player.woodCounter()
+        player.coalCounter()
+        player.brickCounter()
 
 
         fps_text = variables.myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
@@ -371,41 +433,6 @@ def ingameXpBar():
     xpLimit = variables.myFontSmall.render("/ " + str(variables.xpToGo), False, WHITE)
     win.blit(xpLimit, (infoObject.current_w / 1.75, infoObject.current_h - 45))
 
-def healthBarPlayer():
-    global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, brickFlag
-
-    decreaseHealth = realHealthNum * health / 100
-    py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
-    py.draw.rect(win, (0, 255, 0), (20, 40, decreaseHealth, 25))
-    healthDisplay = variables.myFontSmall.render(" | 100", False, WHITE)
-    realHealthDisplay = variables.myFontSmall.render(str(realHealthNum), False, WHITE)
-    player = variables.myFont.render("" + variables.loggedIn, False, WHITE)
-    win.blit(healthDisplay, (45, 43))
-    win.blit(realHealthDisplay, (21, 43))
-    win.blit(player, (21, 10))
-
-    if realHealthNum <= 0:
-        over = True
-        woodFlag = False
-        wood2Flag = False
-        coalFlag = False
-        brickFlag = False
-        variables.coalCount = 0
-        variables.woodCount = 0
-        variables.brickCount = 0
-        variables.powerLevel = 1
-        if variables.setDifficulty == "Easy":
-            variables.burnerStrength = variables.easyStrength
-            variables.powerLevelTickRate = variables.easyPowerTick
-        
-        if variables.setDifficulty == "Medium":
-            variables.burnerStrength = variables.medStrength
-            variables.powerLevelTickRate = variables.medPowerTick
-
-        if variables.setDifficulty == "Hard":
-            variables.burnerStrength = variables.hardStrength
-            variables.powerLevelTickRate = variables.medPowerTick
-        gameOver()
 
 def healthBarBurner():
     global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, brickFlag
@@ -575,19 +602,6 @@ def coal():
 def brick():
     if brickFlag == True:
         win.blit(imageBrick, (brickX, brickY))
-
-
-def woodCounter():
-    count = variables.myFont.render("Wood: " + str(variables.woodCount), False, WHITE)
-    win.blit(count, (infoObject.current_w - 150, 45))
-
-def coalCounter():
-    count = variables.myFont.render("Coal: " + str(variables.coalCount), False, WHITE)
-    win.blit(count, (infoObject.current_w - 150, 70))
-
-def brickCounter():
-    count = variables.myFont.render("Brick: " + str(variables.brickCount), False, WHITE)
-    win.blit(count, (infoObject.current_w - 150, 95))
 
 if __name__ == "__main__":
     startGame()

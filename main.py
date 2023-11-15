@@ -119,9 +119,6 @@ class Player:
         # Draw the player on the screen
         py.draw.rect(win, (variables.colour), (self.x, self.y, self.width, self.height))
 
-    def get_player_size(self):
-        return (self.x, self.y, self.x + self.width, self.y + self.height)
-
     def woodCounter(self):
         count = variables.myFont.render("Wood: " + str(variables.woodCount), False, WHITE)
         win.blit(count, (infoObject.current_w - 150, 45))

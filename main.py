@@ -101,13 +101,13 @@ class Player:
         if keys[py.K_LEFT] or keys[py.K_a] and self.x > 0:
             self.x -= self.velocity
 
-        if keys[py.K_RIGHT] or keys[py.K_d] and self.x > 0:
+        if keys[py.K_RIGHT] or keys[py.K_d] and self.x < infoObject.current_w - width:
             self.x += self.velocity
 
         if keys[py.K_UP] or keys[py.K_w] and self.y > 0:
             self.y -= self.velocity
         
-        if keys[py.K_DOWN] or keys[py.K_s] and self.y > 0:
+        if keys[py.K_DOWN] or keys[py.K_s] and self.y < infoObject.current_h - height:
             self.y += self.velocity
 
     def update_position(self):

@@ -17,6 +17,7 @@ py.display.set_caption("Fight the Storm")
 buttonWidth = 300
 buttonHeight = 80
 
+#get button edges
 play_edges = Edges(infoObject.current_w / 2.4, infoObject.current_w / 2.4 + buttonWidth, infoObject.current_h / 3.3 + buttonHeight, infoObject.current_h / 3.3)
 instructions_edges = Edges(infoObject.current_w / 2.4, infoObject.current_w / 2.4 + buttonWidth, infoObject.current_h / 2.5 + buttonHeight, infoObject.current_h / 2.5)
 login_edges = Edges(infoObject.current_w / 2.4, infoObject.current_w / 2.4 + buttonWidth, infoObject.current_h / 2 + buttonHeight, infoObject.current_h / 2)
@@ -30,6 +31,7 @@ difficulty_edges = Edges(infoObject.current_w / 1.3, infoObject.current_w / 1.3 
 colourButtonWidth = 75
 colourButtonHeight = 75
 
+#get button edges
 purple_edges = Edges(150, 150 + colourButtonWidth, 70 + colourButtonHeight, 70)
 red_edges = Edges(260, 260 + colourButtonWidth, 70 + colourButtonHeight, 70)
 white_edges = Edges(370, 370 + colourButtonWidth, 70 + colourButtonHeight, 70)
@@ -122,10 +124,12 @@ def colourChange():
         currencyDisplay()
         userDisplay()
 
+        #display current colour
         py.draw.rect(variables.win, (variables.colour), (30, 70, colourButtonWidth, colourButtonHeight))
         customise = variables.myFontMedium.render("Current", False, WHITE)
         variables.win.blit(customise, (30, 30))
 
+        #check if colour is owned
         if variables.red != 1:
             customise = variables.myFont.render("50 E", False, WHITE)
             variables.win.blit(customise, (265, 30))
@@ -138,16 +142,20 @@ def colourChange():
             customise = variables.myFont.render("200 E", False, WHITE)
             variables.win.blit(customise, (485, 30))
 
+        #draw buttons
         py.draw.rect(variables.win, (255, 0, 255), (150, 70, colourButtonWidth, colourButtonHeight))
         py.draw.rect(variables.win, (255, 0, 0), (260, 70, colourButtonWidth, colourButtonHeight))
         py.draw.rect(variables.win, (255, 255, 255), (370, 70, colourButtonWidth, colourButtonHeight))
         py.draw.rect(variables.win, (232, 160, 16), (480, 70, colourButtonWidth, colourButtonHeight))
 
+        #set colour to default
         if py.mouse.get_pressed()[0]:
             if purple_edges.left <= mousePos[0] <= purple_edges.right and purple_edges.top <= mousePos[1] <= purple_edges.bottom:
                 print("purple button clicked")
                 variables.colour = 255, 0, 255
 
+        #purchase colour
+        #checks whether colour is owned then checks if user has sufficient funds and if so give colour and take funds
         if py.mouse.get_pressed()[0]:
             if red_edges.left <= mousePos[0] <= red_edges.right and red_edges.top <= mousePos[1] <= red_edges.bottom:
                 print("Red button clicked")
@@ -159,6 +167,7 @@ def colourChange():
                         time.sleep(0.5)
                         purchase()
 
+                #if player already owns the colour then equip it
                 else:
                     variables.colour = 255, 0, 0
 
@@ -199,6 +208,7 @@ def colourChange():
 def difficulty():
     global run
 
+    #find button edges
     easy_edges = Edges(150, 450, 375, 300)
     medium_edges = Edges(150, 450, 485, 410)
     hard_edges = Edges(150, 450, 595, 520)
@@ -214,6 +224,7 @@ def difficulty():
 
         variables.win.fill((16, 6, 48))
 
+        #draw buttons
         py.draw.rect(variables.win, (0, 0, 255), (easy_edges.left, easy_edges.top, easy_edges.size()[0], easy_edges.size()[1]))
         easy = variables.myFont.render("Easy", False, WHITE)
         variables.win.blit(easy, (255, 305))
@@ -229,6 +240,7 @@ def difficulty():
         displayDifficulty = variables.myFont.render("Difficulty: " + variables.setDifficulty, False, WHITE)
         variables.win.blit(displayDifficulty, (25, 30))
 
+        #when buttons are pressed, update difficulty
         if py.mouse.get_pressed()[0]:
             if easy_edges.left <= mousePos[0] <= easy_edges.right and easy_edges.top <= mousePos[1] <= easy_edges.bottom:
                 variables.burnerStrength = variables.easyStrength

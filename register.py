@@ -14,8 +14,8 @@ def registerUser():
         hashed_password = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
 
         #if both fields are empty, show an error message and return without writing to the database
-        if not new_username and not new_password:
-            messagebox.showerror("Registration Failed", "Both Username and Password fields are empty.")
+        if not new_username or not new_password:
+            messagebox.showerror("Registration Failed", "Username and Password fields are empty.")
             return
 
         #connect to the database (or create it if it doesn't exist)
@@ -23,7 +23,9 @@ def registerUser():
         cursor = connection.cursor()
 
         #create the table if it doesn't exist
-        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white INTEGER DEFAULT 0, orange INTEGER DEFAULT 0)")
+        cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, "
+                       "xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white "
+                       "INTEGER DEFAULT 0, orange INTEGER DEFAULT 0)")
 
         #check if the username already exists
         cursor.execute("SELECT * FROM users WHERE username=?", (new_username,))

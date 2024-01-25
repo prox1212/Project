@@ -400,7 +400,8 @@ def exit():
 
     mousePos = py.mouse.get_pos()
 
-    exit_edges = Edges(infoObject.current_w / infoObject.current_w + 35, infoObject.current_w / infoObject.current_w + 35 + 200, infoObject.current_h / infoObject.current_w + 35 + 70, infoObject.current_h / infoObject.current_h + 35)
+    exit_edges = Edges(infoObject.current_w / infoObject.current_w + 35, infoObject.current_w / infoObject.current_w + 35 + 200, infoObject.current_h / infoObject.current_w + 
+                       35 + 70, infoObject.current_h / infoObject.current_h + 35)
 
     py.draw.rect(variables.win, (255, 0, 0), (infoObject.current_w / infoObject.current_w + 35, infoObject.current_h / infoObject.current_h + 35, 200, 70))
     back = variables.myFontBig.render("Exit", False, WHITE)

@@ -30,6 +30,24 @@ def instruction():
 
         win.fill((16, 6, 48))
 
+        head = myFontBig.render("How to play", False, WHITE)
+        win.blit(head, (15, 15))
+
+        body = myFontMedium.render("1) Use W A S D to move", False, WHITE)
+        win.blit(body, (15, 100))
+
+        body = myFontMedium.render("2) Move over objects to pick them up", False, WHITE)
+        win.blit(body, (15, 145))
+
+        body = myFontMedium.render("3) Move to the Burner to deposit materials using E F G", False, WHITE)
+        win.blit(body, (15, 190))
+
+        body = myFontMedium.render("4) Keep the burner healthy and strong", False, WHITE)
+        win.blit(body, (15, 235))
+
+        body = myFontMedium.render("5) Last as long as you can to gain Experience", False, WHITE)
+        win.blit(body, (15, 280))
+
         import menu
         menu.userDisplay()
 

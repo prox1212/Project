@@ -450,8 +450,8 @@ def menu():
         variables.win.blit(register, (infoObject.current_w / 2.28, infoObject.current_h / 1.28))
         
         py.draw.rect(variables.win, (112, 112, 112), (infoObject.current_w / 1.3, infoObject.current_h / 2, buttonWidth, buttonHeight))
-        customise = variables.myFontMedium.render("Cosmetics", False, WHITE)
-        variables.win.blit(customise, (infoObject.current_w / 1.25, infoObject.current_h / 1.95))
+        customise = variables.myFontMedium.render("Shop", False, WHITE)
+        variables.win.blit(customise, (infoObject.current_w / 1.21, infoObject.current_h / 1.95))
 
         py.draw.rect(variables.win, (112, 112, 112), (infoObject.current_w / 1.3, infoObject.current_h / 2.45, buttonWidth, buttonHeight))
         customise = variables.myFontMedium.render("Difficulty", False, WHITE)

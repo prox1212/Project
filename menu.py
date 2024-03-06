@@ -3,7 +3,6 @@ from main import *
 from instructions import *
 from register import *
 from leaderboard import *
-#from login import *
 from vars import *
 
 py.init()

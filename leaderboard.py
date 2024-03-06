@@ -1,7 +1,6 @@
 import pygame as py
 import sqlite3
 from backButton import *
-#from login import *
 from vars import *
 
 py.init()
@@ -13,7 +12,7 @@ win = py.display.set_mode((infoObject.current_w, infoObject.current_h))
 py.display.set_caption("Fight the Storm")
 
 WHITE = (255, 255, 255)
-GREY = (201, 201, 199)
+GREY = (230, 230, 229)
 
 def userBigDisplay():
     usern = variables.myFontBig.render(" " + variables.loggedIn, False, WHITE)
@@ -40,33 +39,44 @@ def createDatabase():
     connection = sqlite3.connect("user_credentials.db")
     cursor = connection.cursor()
 
-    cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white INTEGER DEFAULT 0, orange INTEGER DEFAULT 0)")
+    cursor.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT, level INTEGER DEFAULT 1, "
+                    "xp INTEGER DEFAULT 0, xpToGo INTEGER DEFAULT 50, currency INTEGER DEFAULT 0, "
+                    "isAdmin INTEGER DEFAULT 0, red INTEGER DEFAULT 0, white INTEGER DEFAULT 0, "
+                    "orange INTEGER DEFAULT 0)")
     connection.close()
 
 def displayLeaderboard():
-    # Connect to the database
+    #connect to the database
     connection = sqlite3.connect("user_credentials.db")
     cursor = connection.cursor()
 
-    # Retrieve the top N players based on their level
+    #retrieve the top N players based on their level
     cursor.execute("SELECT username, level FROM users ORDER BY level DESC LIMIT 10")
     leaderboard_data = cursor.fetchall()
 
-    # Display the leaderboard data on the screen
+    #display the leaderboard data on the screen
     yOffset = 200
     for i, (username, player_level) in enumerate(leaderboard_data, start=1):
+        #change the text colour depending on rank
+        if i == 1:
+            GREY = (255,215,0)
+        elif i == 2:
+            GREY = (192,192,192)
+        elif i == 3:
+            GREY = (150, 50, 20)
+        else:
+            GREY = (230, 230, 229)
         leaderboardEntryRank = myFontMedium.render(f"{i}", False, GREY)
         leaderboardEntryName = myFontMedium.render(f"{username}", False, GREY)
         leaderboardEntryLevel = myFontMedium.render(f"{player_level}", False, GREY)
         win.blit(leaderboardEntryRank, (infoObject.current_w / infoObject.current_w + 90, infoObject.current_h / infoObject.current_h + yOffset))
         win.blit(leaderboardEntryName, (infoObject.current_w / infoObject.current_w + 300, infoObject.current_h / infoObject.current_h + yOffset))
         win.blit(leaderboardEntryLevel, (infoObject.current_w / infoObject.current_w + 660, infoObject.current_h / infoObject.current_h + yOffset))
+        #to make sure each record is spaced appart
         yOffset += 60
 
-    # Close the database connection
     connection.close()
 
-# Call this function in your main loop to display the leaderboard
 run = True
 
 

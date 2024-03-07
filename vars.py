@@ -35,7 +35,6 @@ class variables:
     xpDivisor = 30
     currency = 0
     isAdmin = 0
-    over = False
     woodCount = 0
     coalCount = 0
     brickCount = 0
@@ -43,6 +42,7 @@ class variables:
     setDifficulty = "Easy"
     powerLevel = 1
     powerLevelTickRate = 1000
+    gameNotOver = False
 
     #player owned items
     red = 0

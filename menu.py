@@ -461,6 +461,7 @@ def menu():
         if py.mouse.get_pressed()[0]:
             if play_edges.left <= mousePos[0] <= play_edges.right and play_edges.top <= mousePos[1] <= play_edges.bottom:
                 print("Play button clicked")
+                variables.gameNotOver = True
                 startGame()
 
         if py.mouse.get_pressed()[0]:

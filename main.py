@@ -132,7 +132,7 @@ class Player:
         win.blit(count, (infoObject.current_w - 150, 95))
 
     def healthBarPlayer():
-        global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, brickFlag
+        global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, brickFlag, ticks, seconds, minutes
 
         decreaseHealth = realHealthNum * health / 100
         py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
@@ -150,6 +150,9 @@ class Player:
             wood2Flag = False
             coalFlag = False
             brickFlag = False
+            ticks = 0
+            minutes = 0
+            seconds = 0
             variables.coalCount = 0
             variables.woodCount = 0
             variables.brickCount = 0
@@ -189,8 +192,13 @@ def startGame():
     while run:
         py.time.delay(10)
         ticks += 1  #increment ticks
-        #woodSpawnRate += 1
         current_time = pygame.time.get_ticks()
+
+        if variables.gameNotOver:
+            #calculate time in mins and secs when game is running
+            millis = ticks % 100
+            seconds = int(ticks / 100 % 60)
+            minutes = int(ticks / 60000 % 60)
 
         #clock.tick(desiredFps)
         fps = int(clock.get_fps())
@@ -382,6 +390,11 @@ def startGame():
         fps_text = variables.myFontSmall.render(f'FPS: {fps}', True, (255, 255, 255))
         win.blit(fps_text, (infoObject.current_w - 100 , 10))
 
+        #render time
+        if variables.gameNotOver:
+            out = myFontMedium.render('{minutes:02d}:{seconds:02d}'.format(minutes=minutes, seconds=seconds), False, WHITE)
+            win.blit(out,(infoObject.current_w / 2.1, 65))
+
         py.display.update()
 
         clock.tick(desiredFps)
@@ -432,7 +445,7 @@ def ingameXpBar():
 
 
 def healthBarBurner():
-    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, brickFlag
+    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, brickFlag, ticks, minutes, seconds
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
@@ -448,11 +461,13 @@ def healthBarBurner():
         realDurabilityNum = 500
 
     if realDurabilityNum <= 0:
-        over = True
         woodFlag = False
         wood2Flag = False
         coalFlag = False
         brickFlag = False
+        ticks = 0
+        minutes = 0
+        seconds = 0
         variables.coalCount = 0
         variables.woodCount = 0
         variables.brickCount = 0
@@ -513,7 +528,7 @@ def gameOver():
 
     #create a semi-transparent black surface
     game_over_surface = py.Surface((1450, 700), py.SRCALPHA)
-    game_over_surface.fill((0, 0, 0, 178))  # The fourth value (178) controls opacity (0-255)
+    game_over_surface.fill((0, 0, 0, 178))  #the fourth value (178) controls opacity (0-255)
     win.blit(game_over_surface, (250, 175))
 
     title = variables.myFontBig.render("Game Over", False, WHITE)
@@ -521,6 +536,7 @@ def gameOver():
 
     mousePos = py.mouse.get_pos()
 
+    variables.gameNotOver = False
 
     save_edges = Edges(300, 500, 835, 765)
 
@@ -533,42 +549,8 @@ def gameOver():
     if py.mouse.get_pressed()[0]:
         if save_edges.left <= mousePos[0] <= save_edges.right and save_edges.top <= mousePos[1] <= save_edges.bottom:
             print("Save button clicked")
-            if variables.loggedIn != 'nul':
-                try:
-                    #connect to the database
-                    connection = sqlite3.connect("user_credentials.db")
-                    cursor = connection.cursor()
-
-                    #get the users current xp from the database
-                    cursor.execute("SELECT xp FROM users WHERE username=?", (variables.loggedIn,))
-                    current_xp = cursor.fetchone()[0]
-
-                    cursor.execute("SELECT currency FROM users WHERE username=?", (variables.loggedIn,))
-                    current_currency = cursor.fetchone()[0]
-
-                    #only update the database if the xp has changed
-                    if current_xp != variables.xp:
-                        #update the users xp in the database
-                        cursor.execute("UPDATE users SET xp=? WHERE username=?", (variables.xp, variables.loggedIn))
-
-                        #commit the changes and close the database connection
-                        connection.commit()
-                        connection.close()
-                        print("XP saved successfully.")
-
-                    if current_currency != variables.currency:
-                        cursor.execute("UPDATE users SET currency=? WHERE username=?", (variables.currency, variables.loggedIn))
-
-                        connection.commit()
-                        connection.close()
-                        print("currency saved successfully.")
-
-                    else:
-                        print("XP is unchanged. No update needed.")
-                except sqlite3.Error as e:
-                    print("SQLite error:", e)
-                except Exception as ex:
-                    print("Error:", ex)
+            import menu
+            menu.save()
 
     
     py.draw.rect(win, (255, 0, 0), (menu_edges.left, menu_edges.top, 200, 70))
@@ -578,6 +560,7 @@ def gameOver():
     if py.mouse.get_pressed()[0]:
         if menu_edges.left <= mousePos[0] <= menu_edges.right and menu_edges.top <= mousePos[1] <= menu_edges.bottom:
             print("Menu button clicked")
+            #reset player and burner health
             realDurabilityNum = 500
             realHealthNum = 100
             import menu

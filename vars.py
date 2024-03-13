@@ -41,7 +41,7 @@ class variables:
     colour = (255, 0, 255)
     setDifficulty = "Easy"
     powerLevel = 1
-    powerLevelTickRate = 1000
+    powerLevelTickRate = 1200
     gameNotOver = False
 
     #player owned items
@@ -52,7 +52,7 @@ class variables:
     #woodSpawnRate = 0
 
     #storm
-    burnerStrength = 8
+    burnerStrength = 12
 
     easyStrength = 12
     medStrength = 10

@@ -31,7 +31,7 @@ height = 35
 pos_x = infoObject.current_w / 2
 pos_y = infoObject.current_h / 2
 
-velocity = 3
+velocity = 2.3
 
 health = 250
 realHealth = 100
@@ -132,7 +132,7 @@ class Player:
         win.blit(count, (infoObject.current_w - 150, 95))
 
     def healthBarPlayer():
-        global realHealth, realHealthNum, realDurabilityNum, over, woodFlag, wood2Flag, coalFlag, brickFlag, ticks, seconds, minutes
+        global realHealth, realHealthNum, realDurabilityNum
 
         decreaseHealth = realHealthNum * health / 100
         py.draw.rect(win, (125, 125, 125), (20, 40, 250, 25))
@@ -145,30 +145,7 @@ class Player:
         win.blit(player, (21, 10))
 
         if realHealthNum <= 0:
-            over = True
-            woodFlag = False
-            wood2Flag = False
-            coalFlag = False
-            brickFlag = False
-            ticks = 0
-            minutes = 0
-            seconds = 0
-            variables.coalCount = 0
-            variables.woodCount = 0
-            variables.brickCount = 0
-            variables.powerLevel = 1
-            if variables.setDifficulty == "Easy":
-                variables.burnerStrength = variables.easyStrength
-                variables.powerLevelTickRate = variables.easyPowerTick
-
-            if variables.setDifficulty == "Medium":
-                variables.burnerStrength = variables.medStrength
-                variables.powerLevelTickRate = variables.medPowerTick
-
-            if variables.setDifficulty == "Hard":
-                variables.burnerStrength = variables.hardStrength
-                variables.powerLevelTickRate = variables.medPowerTick
-            gameOver()
+            handleGameReset()
 
 class PlayerEdges:
     def __init__(self, playerTop, playerLeft, playerBottom, playerRight):
@@ -190,14 +167,14 @@ def startGame():
     initialStormSize = 800  #initial stormSize value
     
     while run:
-        py.time.delay(10)
+        py.time.delay(3)
         ticks += 1  #increment ticks
         current_time = pygame.time.get_ticks()
 
         if variables.gameNotOver:
             #calculate time in mins and secs when game is running
             millis = ticks % 100
-            seconds = int(ticks / 100 % 60)
+            seconds = int(ticks / 106 % 60)
             minutes = int(ticks / 60000 % 60)
 
         #clock.tick(desiredFps)
@@ -239,7 +216,7 @@ def startGame():
                 realDurability = str(realDurabilityNum)
 
         #check if the player is outside the green circle (double the radius) and 100 ticks have passed
-        if distance > adjustedStormSize and ticks % 75 == 0:
+        if distance > adjustedStormSize and ticks % 100 == 0:
 
             if realHealthNum > 0 and realDurabilityNum > 0:
                 realHealthNum -= 5
@@ -249,7 +226,7 @@ def startGame():
 
         #check if the player is inside the circle
         if distance < adjustedStormSize:
-            if realHealthNum < 100 and ticks % 45 == 0:
+            if realHealthNum < 100 and ticks % 50 == 0:
                 if realHealthNum > 0 and realDurabilityNum > 0:
                     realHealthNum += 1
                     realHealth = str(realHealthNum)
@@ -445,7 +422,7 @@ def ingameXpBar():
 
 
 def healthBarBurner():
-    global realDurability, realDurabilityNum, realHealthNum, over, woodFlag, wood2Flag, coalFlag, brickFlag, ticks, minutes, seconds
+    global realDurability, realDurabilityNum, realHealthNum
 
     decreaseDurability = realDurabilityNum * durability / 500
     py.draw.rect(win, (125, 125, 125), (20, 100, 250, 25))
@@ -461,29 +438,8 @@ def healthBarBurner():
         realDurabilityNum = 500
 
     if realDurabilityNum <= 0:
-        woodFlag = False
-        wood2Flag = False
-        coalFlag = False
-        brickFlag = False
-        ticks = 0
-        minutes = 0
-        seconds = 0
-        variables.coalCount = 0
-        variables.woodCount = 0
-        variables.brickCount = 0
-        variables.powerLevel = 1
-        if variables.setDifficulty == "Easy":
-            variables.burnerStrength = variables.easyStrength
-            variables.powerLevelTickRate = variables.easyPowerTick
+        handleGameReset()
         
-        if variables.setDifficulty == "Medium":
-            variables.burnerStrength = variables.medStrength
-            variables.powerLevelTickRate = variables.medPowerTick
-
-        if variables.setDifficulty == "Hard":
-            variables.burnerStrength = variables.hardStrength
-            variables.powerLevelTickRate = variables.medPowerTick
-        gameOver()
 
 def levelUp():
     variables.xp = int(variables.xp)
@@ -524,7 +480,7 @@ def levelUp():
         db_update_thread.start()
 
 def gameOver():
-    global run, realHealthNum, realDurabilityNum
+    global run, realHealthNum, realDurabilityNum, seconds, minutes
 
     #create a semi-transparent black surface
     game_over_surface = py.Surface((1450, 700), py.SRCALPHA)
@@ -549,6 +505,10 @@ def gameOver():
     if py.mouse.get_pressed()[0]:
         if save_edges.left <= mousePos[0] <= save_edges.right and save_edges.top <= mousePos[1] <= save_edges.bottom:
             print("Save button clicked")
+
+            minutes = 0
+            seconds = 0
+
             import menu
             menu.save()
 
@@ -566,6 +526,30 @@ def gameOver():
             import menu
             menu.menu()
             run = False
+
+def handleGameReset():
+    global woodFlag, wood2Flag, coalFlag, brickFlag, ticks
+    woodFlag = False
+    wood2Flag = False
+    coalFlag = False
+    brickFlag = False
+    ticks = 0
+    variables.coalCount = 0
+    variables.woodCount = 0
+    variables.brickCount = 0
+    variables.powerLevel = 1
+    if variables.setDifficulty == "Easy":
+        variables.burnerStrength = variables.easyStrength
+        variables.powerLevelTickRate = variables.easyPowerTick
+    
+    if variables.setDifficulty == "Medium":
+        variables.burnerStrength = variables.medStrength
+        variables.powerLevelTickRate = variables.medPowerTick
+
+    if variables.setDifficulty == "Hard":
+        variables.burnerStrength = variables.hardStrength
+        variables.powerLevelTickRate = variables.medPowerTick
+    gameOver()
 
 def wood():
     if woodFlag == True:

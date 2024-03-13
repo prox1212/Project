@@ -58,9 +58,9 @@ class variables:
     medStrength = 6
     hardStrength = 4
 
-    easyPowerTick = 1000
-    medPowerTick = 800
-    hardPowerTick = 600
+    easyPowerTick = 1200
+    medPowerTick = 1000
+    hardPowerTick = 800
 
     powerLevelTickDecayRate = 30
 

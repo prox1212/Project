@@ -9,7 +9,6 @@ import customtkinter as tk
 import sqlite3
 import threading
 import hashlib
-#from login import *
 from backButton import *
 from vars import *
 
@@ -39,6 +38,9 @@ realHealth = str(realHealth)
 realHealthNum = int(realHealth)
 
 hit_multiple_4 = False
+
+minutes = 0
+seconds = 0
 
 # Storm
 alpha_value = 128
@@ -145,27 +147,7 @@ class Player:
         win.blit(player, (21, 10))
 
         if realHealthNum <= 0:
-            over = True
-            woodFlag = False
-            wood2Flag = False
-            coalFlag = False
-            brickFlag = False
-            variables.coalCount = 0
-            variables.woodCount = 0
-            variables.brickCount = 0
-            variables.powerLevel = 1
-            if variables.setDifficulty == "Easy":
-                variables.burnerStrength = variables.easyStrength
-                variables.powerLevelTickRate = variables.easyPowerTick
-
-            if variables.setDifficulty == "Medium":
-                variables.burnerStrength = variables.medStrength
-                variables.powerLevelTickRate = variables.medPowerTick
-
-            if variables.setDifficulty == "Hard":
-                variables.burnerStrength = variables.hardStrength
-                variables.powerLevelTickRate = variables.medPowerTick
-            gameOver()
+            handleGameReset()
 
 class PlayerEdges:
     def __init__(self, playerTop, playerLeft, playerBottom, playerRight):
@@ -182,7 +164,7 @@ def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
     global woodX, woodY, wood2Flag, brickFlag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, last_brick_addition_time, coalFlag
     global coalX, coalY, brickX, brickY
-    global previous_ticks, fps
+    global previous_ticks, fps, minutes, seconds
 
     initialStormSize = 800  #initial stormSize value
     
@@ -190,6 +172,12 @@ def startGame():
         py.time.delay(3)
         ticks += 1  #increment ticks
         current_time = pygame.time.get_ticks()
+
+        if variables.gameNotOver:
+            #calculate time in mins and secs when game is running
+            millis = ticks % 100
+            seconds = int(ticks / 106 % 60)
+            minutes = int(ticks / 60000 % 60)
 
         #clock.tick(desiredFps)
         fps = int(clock.get_fps())
@@ -452,27 +440,7 @@ def healthBarBurner():
         realDurabilityNum = 500
 
     if realDurabilityNum <= 0:
-        over = True
-        woodFlag = False
-        wood2Flag = False
-        coalFlag = False
-        brickFlag = False
-        variables.coalCount = 0
-        variables.woodCount = 0
-        variables.brickCount = 0
-        variables.powerLevel = 1
-        if variables.setDifficulty == "Easy":
-            variables.burnerStrength = variables.easyStrength
-            variables.powerLevelTickRate = variables.easyPowerTick
-        
-        if variables.setDifficulty == "Medium":
-            variables.burnerStrength = variables.medStrength
-            variables.powerLevelTickRate = variables.medPowerTick
-
-        if variables.setDifficulty == "Hard":
-            variables.burnerStrength = variables.hardStrength
-            variables.powerLevelTickRate = variables.medPowerTick
-        gameOver()
+        handleGameReset()
 
 def levelUp():
     variables.xp = int(variables.xp)

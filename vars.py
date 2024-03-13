@@ -54,9 +54,9 @@ class variables:
     #storm
     burnerStrength = 8
 
-    easyStrength = 8
-    medStrength = 6
-    hardStrength = 4
+    easyStrength = 12
+    medStrength = 10
+    hardStrength = 8
 
     easyPowerTick = 1200
     medPowerTick = 1000

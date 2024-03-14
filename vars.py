@@ -30,7 +30,7 @@ class variables:
     loggedIn = 'nul'
     level = 1
     xp = 0
-    xpToGo = 100
+    xpToGo = 50
     xpToGoMultiplier = 1.2
     xpDivisor = 30
     currency = 0
@@ -52,11 +52,11 @@ class variables:
     #woodSpawnRate = 0
 
     #storm
-    burnerStrength = 12
+    burnerStrength = 14
 
-    easyStrength = 12
-    medStrength = 10
-    hardStrength = 8
+    easyStrength = 14
+    medStrength = 12
+    hardStrength = 10
 
     easyPowerTick = 1200
     medPowerTick = 1000

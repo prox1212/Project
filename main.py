@@ -1,10 +1,7 @@
-from lib2to3.pgen2.token import LEFTSHIFT
 import pygame as py
 import pygame.time
 import random
 import time
-import tkinter as tk
-from tkinter import messagebox
 import customtkinter as tk
 import sqlite3
 import threading
@@ -163,13 +160,13 @@ run = True
 def startGame():
     global pos_x, pos_y, run, ticks, realHealthNum, stormSize, distance, realHealth, health, realDurabilityNum, realDurability, woodFlag
     global woodX, woodY, wood2Flag, brickFlag, wood2X, wood2Y, last_wood_addition_time, last_coal_addition_time, last_brick_addition_time, coalFlag
-    global coalX, coalY, brickX, brickY
+    global coalX, coalY, brickX, brickY, hit_multiple_4
     global previous_ticks, fps, minutes, seconds
 
     initialStormSize = 800  #initial stormSize value
     
     while run:
-        py.time.delay(3)
+        py.time.delay(2)
         ticks += 1  #increment ticks
         current_time = pygame.time.get_ticks()
 
@@ -177,7 +174,7 @@ def startGame():
             #calculate time in mins and secs when game is running
             millis = ticks % 100
             seconds = int(ticks / 106 % 60)
-            minutes = int(ticks / 60000 % 60)
+            minutes = int(ticks / 6360 % 60)
 
         #clock.tick(desiredFps)
         fps = int(clock.get_fps())
@@ -233,6 +230,8 @@ def startGame():
                     realHealthNum += 1
                     realHealth = str(realHealthNum)
 
+        
+        #experience packages
         xp_conditions = [(variables.xpDivisor, 1), (6000, 150), (18000, 450), (30000, 1000)]
 
         for condition, xp_increment in xp_conditions:
@@ -471,6 +470,7 @@ def levelUp():
 
                 connection.commit()
                 connection.close()
+                print("level up: data backed up!")
             except sqlite3.Error as e:
                 print("SQLite error:", e)
             except Exception as ex:
